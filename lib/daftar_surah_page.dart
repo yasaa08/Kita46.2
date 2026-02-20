@@ -1,5 +1,4 @@
 // lib/daftar_surah_page.dart
-// VERSI BARU DENGAN SEARCH BAR & DESAIN LIST TILE BARU
 
 import 'dart:convert';
 import 'package:flutter/material.dart';
@@ -14,19 +13,18 @@ class DaftarSurahPage extends StatefulWidget {
 }
 
 class _DaftarSurahPageState extends State<DaftarSurahPage> {
-  List _allSurah = [];        // Menyimpan semua data surah asli
-  List _filteredSurah = [];  // Menyimpan data surah yang sudah difilter
+  List _allSurah = [];        
+  List _filteredSurah = [];  
   bool _isLoading = true;
   final TextEditingController _searchController = TextEditingController();
 
-  // Method untuk membaca data JSON
   Future<void> readJson() async {
     try {
       final String response = await rootBundle.loadString('assets/list_surah.json');
       final data = await json.decode(response);
       setState(() {
         _allSurah = data;
-        _filteredSurah = _allSurah; // Awalnya, tampilkan semua
+        _filteredSurah = _allSurah; 
         _isLoading = false;
       });
     } catch (e) {
@@ -37,11 +35,10 @@ class _DaftarSurahPageState extends State<DaftarSurahPage> {
     }
   }
 
-  // Method untuk filter surah berdasarkan input pencarian
   void _filterSurah(String query) {
     List results = [];
     if (query.isEmpty) {
-      results = _allSurah; // Jika kosong, tampilkan semua
+      results = _allSurah; 
     } else {
       results = _allSurah.where((surah) {
         final nameLower = surah['name'].toString().toLowerCase();
@@ -58,13 +55,11 @@ class _DaftarSurahPageState extends State<DaftarSurahPage> {
   void initState() {
     super.initState();
     readJson();
-    // Tambahkan listener ke search controller
     _searchController.addListener(() {
       _filterSurah(_searchController.text);
     });
   }
 
-  // Jangan lupa dispose controller saat widget dihapus
   @override
   void dispose() {
     _searchController.dispose();
@@ -74,78 +69,71 @@ class _DaftarSurahPageState extends State<DaftarSurahPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black, // Background hitam
+      backgroundColor: const Color(0xFF121212), 
       appBar: AppBar(
-        title: const Text('Daftar Surah'),
-        backgroundColor: Colors.black, // AppBar hitam
-        elevation: 0, // Hilangkan bayangan AppBar
+        title: const Text('Daftar Surah', style: TextStyle(color: Color(0xFFF5F5F5))),
+        iconTheme: const IconThemeData(color: Color(0xFFF5F5F5)),
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator(color: Colors.teal))
-          : Column( // Kita bungkus dengan Column
+          ? const Center(child: CircularProgressIndicator(color: Color(0xFF4DB6AC)))
+          : Column( 
               children: [
-                // ================== SEARCH BAR ==================
                 Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: TextField(
                     controller: _searchController,
-                    style: const TextStyle(color: Colors.white), // Warna teks input
+                    style: const TextStyle(color: Color(0xFFF5F5F5)), 
                     decoration: InputDecoration(
                       filled: true,
-                      fillColor: const Color(0xFF1F1F1F), // #1F1F1F Abu gelap
+                      fillColor: const Color(0xFF1E1E1E), 
                       hintText: 'Cari Surah...',
-                      hintStyle: const TextStyle(color: Color(0xFF9E9E9E)), // #9E9E9E Abu
+                      hintStyle: const TextStyle(color: Color(0xFFA0A0A0)), 
                       prefixIcon: const Icon(
                         Icons.search, 
-                        color: Color(0xFF9E9E9E) // #9E9E9E Abu
+                        color: Color(0xFFA0A0A0)
                       ),
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(30.0), // Membulat penuh
-                        borderSide: BorderSide.none, // Tanpa border luar
+                        borderRadius: BorderRadius.circular(30.0), 
+                        borderSide: BorderSide.none, 
                       ),
                       contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 20),
                     ),
                   ),
                 ),
-                
-                // ================== LIST VIEW ==================
-                Expanded( // Agar ListView mengisi sisa ruang
-                  child: ListView.separated( // Menggunakan separated untuk pemisah
-                    itemCount: _filteredSurah.length, // Gunakan list yang sudah difilter
+                Expanded( 
+                  child: ListView.separated( 
+                    itemCount: _filteredSurah.length, 
                     itemBuilder: (context, index) {
                       final surah = _filteredSurah[index];
                       return ListTile(
-                        // --- Lingkaran Nomor ---
                         leading: CircleAvatar(
-                          radius: 20, // Sesuai spek
-                          backgroundColor: const Color(0xFF00796B), // #00796B Teal
+                          radius: 20, 
+                          backgroundColor: const Color(0xFF1E1E1E), // Soft dark
                           child: Text(
                             surah["number"].toString(),
                             style: const TextStyle(
-                              color: Colors.white, // #FFFFFF
+                              color: Color(0xFF4DB6AC), // Teks nomor warna Soft Teal
                               fontSize: 14,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
                         ),
-                        // --- Teks Judul (Nama Surah) ---
                         title: Text(
                           surah["name"],
                           style: const TextStyle(
-                            color: Colors.white, // #FFFFFF
+                            color: Color(0xFFF5F5F5), 
                             fontSize: 16,
-                            fontWeight: FontWeight.w500, // Medium
+                            fontWeight: FontWeight.w500, 
                           ),
                         ),
-                        // --- Teks Subtitle (Keterangan) ---
                         subtitle: Text(
                           '${surah["revelation"]} - ${surah["numberOfAyahs"]} Ayat',
                           style: const TextStyle(
-                            color: Color(0xFFBDBDBD), // #BDBDBD Abu terang
+                            color: Color(0xFFA0A0A0), 
                             fontSize: 14,
                           ),
                         ),
                         onTap: () {
-                          // Navigasi ke Halaman Detail (tidak berubah)
                           Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -158,12 +146,11 @@ class _DaftarSurahPageState extends State<DaftarSurahPage> {
                         },
                       );
                     },
-                    // --- Pemisah (Divider) ---
                     separatorBuilder: (context, index) => const Divider(
-                      color: Color(0xFF1F1F1F), // #1F1F1F Abu gelap
+                      color: Color(0xFF2C2C2C), // Garis pemisah soft
                       thickness: 1,
-                      height: 1, // Penting agar tidak terlalu tebal
-                      indent: 72, // Agar sejajar dengan teks (lebar CircleAvatar + padding)
+                      height: 1, 
+                      indent: 72, 
                       endIndent: 16,
                     ),
                   ),

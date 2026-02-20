@@ -1,10 +1,9 @@
 // lib/pr13_page.dart
-// VERSI BARU - LIST BIASA, PINDAH KE HALAMAN DETAIL
 
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'pr13_detail_page.dart'; // Import halaman detail baru
+import 'pr13_detail_page.dart'; 
 
 class Pr13Page extends StatefulWidget {
   const Pr13Page({super.key});
@@ -17,7 +16,6 @@ class _Pr13PageState extends State<Pr13Page> {
   List _pr13List = [];
   bool _isLoading = true;
 
-  // Method baca JSON (tidak berubah)
   Future<void> readJson() async {
     try {
       final String response = await rootBundle.loadString('assets/PR 13/pr13.json');
@@ -43,49 +41,44 @@ class _Pr13PageState extends State<Pr13Page> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: const Color(0xFF121212),
       appBar: AppBar(
-        title: const Text('PR 13'),
-        backgroundColor: Colors.black,
-        elevation: 0,
+        title: const Text('PR 13', style: TextStyle(color: Color(0xFFF5F5F5))),
+        iconTheme: const IconThemeData(color: Color(0xFFF5F5F5)),
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator(color: Colors.teal))
-          // Gunakan ListView.separated untuk garis pemisah
+          ? const Center(child: CircularProgressIndicator(color: Color(0xFF4DB6AC)))
           : ListView.separated( 
-              padding: const EdgeInsets.symmetric(vertical: 12.0), // Padding atas bawah list
+              padding: const EdgeInsets.symmetric(vertical: 12.0), 
               itemCount: _pr13List.length,
               itemBuilder: (context, index) {
                 final doa = _pr13List[index];
 
-                // Gunakan ListTile di dalam Card (atau langsung ListTile)
                 return ListTile(
                   title: Text(
-                    doa['title'] ?? 'PR-${doa['id']}', // Tampilkan "PR-X"
+                    doa['title'] ?? 'PR-${doa['id']}', 
                     style: const TextStyle(
-                      color: Colors.white,
+                      color: Color(0xFFF5F5F5),
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
-                  trailing: const Icon(Icons.chevron_right, color: Colors.grey), // Panah ke kanan
+                  trailing: const Icon(Icons.chevron_right, color: Color(0xFF4DB6AC)), 
                   onTap: () {
-                    // Pindah ke halaman detail saat di-klik
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => Pr13DetailPage(doaData: doa), // Kirim data 'doa'
+                        builder: (context) => Pr13DetailPage(doaData: doa), 
                       ),
                     );
                   },
                 );
               },
-              // Garis pemisah antar item
               separatorBuilder: (context, index) => const Divider(
-                color: Color(0xFF1F1F1F), 
+                color: Color(0xFF2C2C2C), 
                 thickness: 1,
                 height: 1,
-                indent: 16, // Sesuaikan indent
+                indent: 16, 
                 endIndent: 16,
               ),
             ),

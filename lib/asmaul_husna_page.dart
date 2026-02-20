@@ -1,5 +1,4 @@
 // lib/asmaul_husna_page.dart
-// VERSI KARTU INTERAKTIF (HANYA ARTI, TANPA CONTOH)
 
 import 'dart:convert';
 import 'package:flutter/material.dart';
@@ -16,7 +15,6 @@ class _AsmaulHusnaPageState extends State<AsmaulHusnaPage> {
   List _asmaulHusna = [];
   bool _isLoading = true;
 
-  // Method baca JSON (tidak berubah)
   Future<void> readJson() async {
     try {
       final String response = await rootBundle.loadString('assets/Asmaul husna/asmaul_husna.json');
@@ -42,22 +40,20 @@ class _AsmaulHusnaPageState extends State<AsmaulHusnaPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: const Color(0xFF121212),
       appBar: AppBar(
-        title: const Text('Asmaul Husna'),
-        backgroundColor: Colors.black,
-        elevation: 0,
+        title: const Text('Asmaul Husna', style: TextStyle(color: Color(0xFFF5F5F5))),
+        iconTheme: const IconThemeData(color: Color(0xFFF5F5F5)),
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator(color: Colors.teal))
+          ? const Center(child: CircularProgressIndicator(color: Color(0xFF4DB6AC)))
           : GridView.builder(
               padding: const EdgeInsets.all(12.0),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2, 
                 crossAxisSpacing: 12.0,
                 mainAxisSpacing: 12.0,
-                // Rasio mungkin bisa sedikit lebih kecil karena konten detail berkurang
-                childAspectRatio: 1.0, // Coba 1.0
+                childAspectRatio: 1.0, 
               ),
               itemCount: _asmaulHusna.length,
               itemBuilder: (context, index) {
@@ -69,85 +65,102 @@ class _AsmaulHusnaPageState extends State<AsmaulHusnaPage> {
   }
 }
 
-// ================== WIDGET KARTU INTERAKTIF ==================
-class AsmaulHusnaCard extends StatefulWidget {
+class AsmaulHusnaCard extends StatelessWidget {
   final Map<String, dynamic> itemData; 
 
   const AsmaulHusnaCard({super.key, required this.itemData});
 
-  @override
-  State<AsmaulHusnaCard> createState() => _AsmaulHusnaCardState();
-}
-
-class _AsmaulHusnaCardState extends State<AsmaulHusnaCard> {
-  bool _isExpanded = false; 
+  void _showDetailBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: const Color(0xFF1E1E1E),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                itemData['arabic'],
+                style: const TextStyle(
+                  fontFamily: 'LPMQ', 
+                  fontSize: 32, 
+                  color: Color(0xFF4DB6AC)
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                itemData['latin'],
+                style: const TextStyle(
+                  fontSize: 18, 
+                  color: Color(0xFFF5F5F5), 
+                  fontWeight: FontWeight.bold
+                ),
+              ),
+              const Divider(color: Color(0xFF2C2C2C), height: 32),
+              const Text(
+                'Arti:',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold, 
+                  color: Color(0xFF4DB6AC), 
+                  fontSize: 14
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                itemData['translation_id'],
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontStyle: FontStyle.italic, 
+                  color: Color(0xFFE0E0E0), 
+                  fontSize: 16
+                ),
+              ),
+              const SizedBox(height: 24),
+            ],
+          ),
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: const Color(0xFF1F1F1F), 
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      color: const Color(0xFF1E1E1E), 
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+        side: const BorderSide(color: Color(0xFF2C2C2C), width: 1),
+      ),
       clipBehavior: Clip.antiAlias, 
       child: InkWell( 
-        onTap: () {
-          setState(() {
-            _isExpanded = !_isExpanded; 
-          });
-        },
+        onTap: () => _showDetailBottomSheet(context), 
         child: Padding(
           padding: const EdgeInsets.all(12.0), 
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.start, 
+            mainAxisAlignment: MainAxisAlignment.center, 
             crossAxisAlignment: CrossAxisAlignment.stretch, 
             children: [
-              // --- Tampilan Awal (Selalu Tampil) ---
               Text(
-                widget.itemData['arabic'],
+                itemData['arabic'],
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   fontFamily: 'LPMQ',
-                  fontSize: 20, 
-                  color: Colors.white,
+                  fontSize: 24, 
+                  color: Color(0xFFF5F5F5),
                 ),
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: 8),
               Text(
-                widget.itemData['latin'],
+                itemData['latin'],
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   fontSize: 12, 
-                  color: Colors.grey,
+                  color: Color(0xFFA0A0A0),
                 ),
-              ),
-
-              // --- Tampilan Detail (Hanya Arti) ---
-              AnimatedSize(
-                duration: const Duration(milliseconds: 300), 
-                curve: Curves.easeInOut, 
-                child: _isExpanded 
-                    ? Padding(
-                        padding: const EdgeInsets.only(top: 12.0), 
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Divider(color: Colors.grey.shade700), 
-                            const SizedBox(height: 8),
-                            // 1. Arti
-                            const Text(
-                              'Arti:',
-                              style: TextStyle(fontWeight: FontWeight.bold, color: Colors.tealAccent, fontSize: 12),
-                            ),
-                            Text(
-                              widget.itemData['translation_id'],
-                              style: const TextStyle(fontStyle: FontStyle.italic, color: Colors.white70, fontSize: 12),
-                            ),
-                           
-                            // BAGIAN CONTOH SUDAH DIHAPUS DARI SINI
-
-                          ],
-                        ),
-                      )
-                    : const SizedBox.shrink(), 
               ),
             ],
           ),

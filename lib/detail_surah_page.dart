@@ -1,5 +1,4 @@
 // lib/detail_surah_page.dart
-// VERSI BARU - INFO SURAH BARU + EFEK SCROLL HILANG + FIX NOMOR AYAT
 
 import 'dart:convert';
 import 'package:flutter/material.dart';
@@ -42,7 +41,6 @@ class _DetailSurahPageState extends State<DetailSurahPage> {
   bool _isLoading = true;
 
   Future<void> readJson() async {
-    // ... (Fungsi readJson tidak berubah) ...
     try {
       final String response = await rootBundle.loadString('assets/surah/${widget.surahNumber}.json');
       final data = await json.decode(response);
@@ -73,81 +71,89 @@ class _DetailSurahPageState extends State<DetailSurahPage> {
     final String? bismillahPre = _surahData['preBismillah']?['text']?['arab'];
 
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: const Color(0xFF121212),
       appBar: AppBar(
-        title: Text(widget.surahName),
-        backgroundColor: Colors.black,
-        elevation: 0,
+        title: Text(widget.surahName, style: const TextStyle(color: Color(0xFFF5F5F5))),
+        iconTheme: const IconThemeData(color: Color(0xFFF5F5F5)),
         actions: [ 
-          IconButton(icon: const Icon(Icons.play_circle_outline), onPressed: () {}),
-          IconButton(icon: const Icon(Icons.bookmark_border), onPressed: () {}),
-          IconButton(icon: const Icon(Icons.share), onPressed: () {}),
+          IconButton(
+            icon: const Icon(Icons.play_circle_outline, color: Color(0xFF4DB6AC)), 
+            onPressed: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Fitur audio segera hadir!')),
+              );
+            }
+          ),
+          IconButton(
+            icon: const Icon(Icons.bookmark_border, color: Color(0xFF4DB6AC)), 
+            onPressed: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Fitur bookmark segera hadir!')),
+              );
+            }
+          ),
+          IconButton(
+            icon: const Icon(Icons.share, color: Color(0xFF4DB6AC)), 
+            onPressed: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Fitur share segera hadir!')),
+              );
+            }
+          ),
         ],
       ),
-      // BODY SEKARANG LANGSUNG LISTVIEW
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator(color: Colors.teal))
+          ? const Center(child: CircularProgressIndicator(color: Color(0xFF4DB6AC)))
           : numberOfAyahs == 0 
-              ? const Center(child: Text('Gagal memuat data ayat.'))
+              ? const Center(child: Text('Gagal memuat data ayat.', style: TextStyle(color: Color(0xFFF5F5F5))))
               : ListView.builder(
-                  // Jumlah item = Jumlah ayat + 1 (untuk bagian info di atas)
                   itemCount: numberOfAyahs + 1, 
                   itemBuilder: (context, index) {
                     
-                    // ============ ITEM PERTAMA (INDEX 0): BAGIAN INFO SURAH ============
                     if (index == 0) {
                       return Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                         child: Card(
-                          color: const Color(0xFF1F1F1F), // Abu gelap
+                          color: const Color(0xFF1E1E1E), 
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                           child: Padding(
-                            padding: const EdgeInsets.all(16.0), // Padding lebih besar
+                            padding: const EdgeInsets.all(16.0), 
                             child: Column(
                               children: [
-                                // --- Baris Info Atas ---
                                 Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween, // Jaga jarak
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween, 
                                   children: [
-                                    // Oval Juz (Placeholder)
                                     Container(
                                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                                       decoration: BoxDecoration(
-                                        // color: Colors.teal.shade700, // Warna oval
-                                        borderRadius: BorderRadius.circular(20), // Bentuk lonjong
-                                        border: Border.all(color: Colors.teal.shade300, width: 1),
+                                        borderRadius: BorderRadius.circular(20), 
+                                        border: Border.all(color: const Color(0xFF4DB6AC), width: 1),
                                       ),
                                       child: Text( 
-                                        // Ambil nomor Juz dari contekan berdasarkan nomor surah
                                         'Juz ${surahToJuzMap[widget.surahNumber] ?? '?'}', 
-                                        style: const TextStyle(color: Colors.white, fontSize: 12),
+                                        style: const TextStyle(color: Color(0xFF4DB6AC), fontSize: 12, fontWeight: FontWeight.bold),
                                       ),
                                     ),
-                                    
-                                    // Nama Terjemahan
                                     Text(
                                       translatedName, 
-                                      style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w500),
+                                      style: const TextStyle(color: Color(0xFFF5F5F5), fontSize: 14, fontWeight: FontWeight.w500),
                                     ),
-                                    
-                                    // Jumlah Ayat
                                     Text(
                                       '$numberOfAyahs Ayat', 
-                                      style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w500),
+                                      style: const TextStyle(color: Color(0xFFF5F5F5), fontSize: 14, fontWeight: FontWeight.w500),
                                     ),
                                   ],
                                 ),
 
-                                // --- Bismillah (jika ada) ---
                                 if (bismillahPre != null)
                                   Padding(
-                                    padding: const EdgeInsets.only(top: 20.0), // Jarak lebih besar
+                                    padding: const EdgeInsets.only(top: 20.0),
                                     child: Text(
                                       bismillahPre,
                                       style: const TextStyle(
                                         fontFamily: 'LPMQ',
-                                        fontSize: 28, // Perbesar Bismillah
-                                        color: Colors.white,
+                                        fontSize: 28, 
+                                        color: Color(0xFFF5F5F5),
                                       ),
                                       textDirection: TextDirection.rtl, 
                                     ),
@@ -159,8 +165,6 @@ class _DetailSurahPageState extends State<DetailSurahPage> {
                       );
                     }
 
-                    // ============ ITEM SELANJUTNYA (INDEX > 0): AYAT-AYAT ============
-                    // Nomor ayat asli = index (karena index 0 sudah dipakai info)
                     final String verseNumber = index.toString(); 
                     final String arab = arabicText[verseNumber] ?? 'Teks tidak ditemukan';
 
@@ -169,25 +173,22 @@ class _DetailSurahPageState extends State<DetailSurahPage> {
                       child: Row( 
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // --- Nomor Ayat dengan Ornament ---
                           SizedBox(
                             width: 40, 
                             child: Stack( 
                               alignment: Alignment.center,
                               children: [
-                                // 1. Gambar Ornamen
                                 Image.asset( 
                                   'assets/images/ornamenayat1.png', 
                                   width: 36, 
                                   height: 36,
                                   errorBuilder: (context, error, stackTrace) => 
-                                    const Icon(Icons.circle_outlined, color: Colors.teal, size: 36), 
+                                    const Icon(Icons.circle_outlined, color: Color(0xFF4DB6AC), size: 36), 
                                 ),
-                                // 2. Teks Nomor Ayat (di atas ornamen)
                                 Text(
                                   verseNumber,
                                   style: const TextStyle(
-                                    color: Color.fromARGB(255, 255, 255, 255), // Coba Hitam agar kontras
+                                    color: Color(0xFFF5F5F5), 
                                     fontSize: 12,
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -197,7 +198,6 @@ class _DetailSurahPageState extends State<DetailSurahPage> {
                           ),
                           const SizedBox(width: 16), 
                           
-                          // --- Teks Arab ---
                           Expanded( 
                             child: Text(
                               arab,
@@ -205,7 +205,7 @@ class _DetailSurahPageState extends State<DetailSurahPage> {
                               style: const TextStyle(
                                 fontSize: 28, 
                                 fontFamily: 'LPMQ',
-                                color: Colors.white, 
+                                color: Color(0xFFF5F5F5), 
                                 height: 1.8, 
                               ),
                             ),
@@ -218,10 +218,3 @@ class _DetailSurahPageState extends State<DetailSurahPage> {
     );
   }
 }
-
-// Widget InfoChip tidak dipakai lagi, bisa dihapus atau di-comment
-/*
-class InfoChip extends StatelessWidget {
-  // ...
-}
-*/

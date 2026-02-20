@@ -3,7 +3,6 @@ description: "A new Flutter project."
 publish_to: 'none'
 version: 1.0.0+1
 
-# INI BAGIAN YANG DIPERBAIKI (Spasi gaib sudah dihapus)
 environment:
   sdk: '>=3.3.0 <4.0.0'
 
@@ -20,25 +19,23 @@ dev_dependencies:
   flutter_lints: ^5.0.0
   flutter_launcher_icons: ^0.13.1
 
+# Konfigurasi ikon aplikasi (sejajar di kiri)
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/images/Merahldii.png"
+  min_sdk_android: 21
+
+# Konfigurasi khusus flutter (sejajar di kiri)
 flutter:
   uses-material-design: true
 
-  # Tambahkan bagian ini di PALING BAWAH, sejajar dengan 'name:' atau 'flutter:'
-flutter_launcher_icons:
-  android: "launcher_icon"   # Nama file ikon untuk Android (default)
-  ios: true                 # Buatkan ikon untuk iOS juga
-  image_path: "assets/images/Merahldii.png" # <-- GANTI DENGAN PATH IKONMU
-  min_sdk_android: 21       # Minimum SDK Android (sesuaikan jika perlu)
-  # remove_alpha_ios: true  # Aktifkan jika ikonmu tidak perlu transparan di iOS
-  # adaptive_icon_background: "#000000" # Warna background ikon adaptif Android (misal: hitam)
-  # adaptive_icon_foreground: "assets/images/icon_foreground.png" # Gambar foreground ikon adaptif Android
-
-  # INI BAGIAN YANG DIPERBAIKI (Path aset sudah dibenarkan)
+  # Blok assets HARUS ada di dalam blok flutter, sejajar dengan uses-material-design
   assets:
     - "assets/Asmaul husna/asmaul_husna.json"
     - assets/surah/
     - assets/list_surah.json
-    - assets/images
+    - assets/images/
     - "assets/PR 13/pr13.json"
 
   # FONT KITA LUPAKAN DULU BIAR GAK ERROR
