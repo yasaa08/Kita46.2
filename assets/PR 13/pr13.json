@@ -1,0 +1,106 @@
+[
+  {
+    "id": 1,
+    "title": "PR-1",
+    "arabic": "لاَ إِلٰهَ إِلاَّ اللهُ وَحْدَهُ لاَ شَرِيْكَ لَهُ لَهُ اْلمُلْكُ وَ لَهُ اْلحَمْدُ وَ هُوَ عَلَى كُلِّ شَيْءٍ قَدِيْرٌ",
+    "latin": "Laailaaha illallahu wahdahu laa syariikalahu lahulmulku walahulhamdu wahuwa ‘ala kulli syai-in qodiir",
+    "translation": "TIADA TUHAN SELAIN ALLOH YANG MAHA ESA, TIADA SEKUTU BAGINYA, BAGINYA/MILIKNYA KERAJAAN, DAN BAGINYA/MILIKNYA SEGALA PUJI, DAN DIA MAHA KUASA ATAS SEGALA SESUATU",
+    "notes": "DIBACA 100 X DALAM SEHARI, KEUTAMANNYA : A. MENDAPAT PAHALA SEPERTI MEMERDEKAKAN 10 BUDAK, B. DITULIS 100 KEBAIKAN, C. DIHAPUS 100 KEJELEKAN, D. DIJAGA DARI GANGGUAN SYETAN, E. TIADA YANG MEMBANDINGINYA KECUALI ORANG YANG MEMBACA LEBIH BANYAK DARI 100 X"
+  },
+  {
+    "id": 2,
+    "title": "PR-2",
+    "arabic": "سُبْحَانَ اللهِ وَ بِحَمْدِهِ",
+    "latin": "Subhanallah wabihamdihi",
+    "translation": "MAHA SUCI ALLOH DAN DENGAN PUJIANNYA",
+    "notes": "DIBACA 100 X DALAM SEHARI, KEUTAMANNYA : DIAMPUNI DOSANYA MESKIPUN SEBANYAK BUIH SAMUDERA"
+  },
+  {
+    "id": 3,
+    "title": "PR-3",
+    "arabic": "سُبْحَانَ اللهِ وَ بِحَمْدِهِ سُبْحَانَ اللهِ اْلعَظِيْمِ",
+    "latin": "Subhanallah wabihamdihi, subhanallahil’adzhim",
+    "translation": "MAHA SUCI ALLOH DAN DENGAN PUJIANNYA, MAHA SUCI ALLOH LAGI MAHA AGUNG",
+    "notes": "DUA KALIMAT YANG DAPAT MEMPERBERAT TIMBANGAN AMAL DIHARI QIYAMAH"
+  },
+  {
+    "id": 4,
+    "title": "PR-4",
+    "arabic": "لاَ إِلٰهَ إِلاَّ اللهُ وَ اللهُ أَكْبَرُ وَ لاَ حَوْلَ وَ لاَ قُوَّةَ إِلاَّ بِاللهِ",
+    "latin": "Laa ilaaha illallaahu wallaahu akbar walaa haula walaa quwwata illa billah",
+    "translation": "TIADA TUHAN SELAIN ALLOH, DAN ALLOH MAHA BESAR, DAN TIADA DAYA SERTA UPAYA MELAINKAN DENGAN SEIZIN ALLOH",
+    "notes": "DIAMPUNI DOSANYA MESKIPUN SEBANYAK BUIH SAMUDERA"
+  },
+  {
+    "id": 5,
+    "title": "PR-5",
+    "arabic": "أَسْتَغْفِرُ اللهَ الَّذِى لاَ إِلٰهَ إِلاَّ هُوَ اْلحَيَّ اْلقَيُّوْمَ وَ اَتُوْبُ اِلَيْهِ",
+    "latin": "Astaghfirullahalladzi laa ilaaha illa huwalhayyalqayyuma wa atuubu ilaihi",
+    "translation": "AKU MINTA AMPUN KEPADA ALLOH YANG TIADA TUHAN SELAINNYA, DIA MAHA HIDUP LAGI MAHA MERAMUT, DAN AKU BERTAUBAT KEPADANYA",
+    "notes": "DIAMPUNI DOSA MESKIPUN TELAH LARI DARI PERANG"
+  },
+  {
+    "id": 6,
+    "title": "PR-6",
+    "arabic": "رَضِيْتُ بِاللهِ رَبًّا وَ بِاْلإِسْلاَمِ دِيْنًا وَ بِمُحَمَّدٍ صَلَّى اللهُ عَلَيْهِ وَ سَلَّمَ رَسُلاً",
+    "latin": "Radhiitu billaahi rabba, wabil islaami diina, wabimuhammadin shallallaahu ‘alaihi wasallam rasuula",
+    "translation": "AKU SENANG KEPADA ALLOH SEBAGAI TUHAN, DAN DENGAN ISLAM SEBAGAI AGAMA, DAN DENGAN NABI MUHAMMAD SHOLLALLOOHU ‘ALAIHI WASALLAM SEBAGAI UTUSAN",
+    "notes": "WAJIB MASUK SURGA BAGI YANG MEMBACANYA"
+  },
+  {
+    "id": 7,
+    "title": "PR-7",
+    "arabic": "سُبْحَانَكَ اللّٰهُمَّ وَ بِحَمْدِكَ أَشْهَدُ أَنْ لاَ إِلٰهَ إِلاَّ أَنْتَ أَسْتَغْفِرُكَ وَ أَتُوْبُ إِلَيْكَ",
+    "latin": "Subhanakallaahumma wabihamdika, asyhadu alla ilaaha illa annta, astaghfiruka wa atuubu ilaika",
+    "translation": "MAHA SUCI ENGKAU YA ALLOH, DAN DENGAN PUJIANMU AKU BERSAKSI BAHWA TIADA TUHAN SELAIN ENGKAU, AKU MINTA AMPUN KEPADAMU, DAN AKU BERTAUBAT KEPADAMU",
+    "notes": "DIBACA SAAT AKAN BERDIRI DARI DUDUK (BILA DALAM DUDUKNYA TIDAK INGAT KEPADA ALLOH), DIAMPUNI LAHAN DAN DOSANYA SELAMA DUDUK"
+  },
+  {
+    "id": 8,
+    "title": "PR-8",
+    "arabic": "رَبِّ اغْفِرْلِى وَ تُبْ عَلَيَّ إِنَّكَ أَنْتَ التَّوَّابُ الرَّحِيْمُ",
+    "latin": "Rabbighfirlii watubb ‘alayya, innaka anntattawwaaburrahiim",
+    "translation": "YA TUHAN, AMPUNILAN SAYA, DAN TERIMALAH TAUBAT ATASKU, SESUNGGUHNYA ENGKAU MAHA PENERIMA TAUBAT LAGI MAHA PENYAYANG",
+    "notes": "AMALAN YANG BIASA DIBACA OLEH NABI MUHAMMAD SAW SEBANYAK 100 X SETIAP DUDUK"
+  },
+  {
+    "id": 9,
+    "title": "PR-9",
+    "arabic": "بِسْمِ اللهِ الَّذِى لاَ يَضُرُّ مَعَ اسْمِهِ شَيْءٌ فِى اْلأَرْضِ وَ لاَ فِى السَّمَاءِ وَ هُوَ السَّمِيْعُ اْلعَلِيْمُ",
+    "latin": "Bismillaahilladzi laa yadhurru ma’as mihi syaiun fil ardhi wa laa fissamaai wahuwassamii’ul ‘aliim",
+    "translation": "DENGAN NAMA ALLOH, YANG TIDAK MEMUDLOROTKAN BESERTA NAMANYA, SESUATU DI LANGIT DAN DI BUMI, DAN DIA MAHA MENDENGAR LAGI MAHA MENGETAHUI",
+    "notes": "DIBACA 3 X PAGI DAN 3 X SORE, DIJAGA DARI SEGALA BAHAYA/KEMUDLOROTAN"
+  },
+  {
+    "id": 10,
+    "title": "PR-10",
+    "arabic": "اَللّٰهُمَّ أَنْتَ رَبِّى لاَ إِلٰهَ إِلاَّ أَنْتَ خَلَقْتَنِى وَ أَنَا عَبْدُكَ وَ أَنَا عَلَى عَهْدِكَ وَ وَعْدِكَ مَا اسْتَطَعْتُ أَعُوْذُبِكَ مِنْ شَرِّمَا صَنَعْتُ وَ أَبُوْءُ إِلَيْكَ بِنِعْمَتِكَ عَلَيَّ وَ أَعْتَرِفُ بِذُنُوْبِى فَاغْفِرْلِى ذُنُوْبِى إِنَّهُ لاَ يَغْفِرُ الذُّنُوْبَ إِلاَّ أَنْتَ",
+    "latin": "Allahumma anta rabbi laa ilaaha illa anta, khalaqtani, wa ana ‘abduka, wa ana ‘ala ‘ahdika wawa’ dika mastatha’tu, a’udzubika min syarrima shana’tu, wa abuu-u ilaika, bini’matika ‘alayya, wa a’tarifu bidzunuubii, faghfirlii dzunuubii, innahu laayaghfirudzunuuba illa anta.",
+    "translation": "YA ALLOH ENGKAU TUHANKU, TIADA TUHAN SELAIN ENGKAU, ENGKAU TELAH MENCIPTAKANKU, DAN AKU HAMBAMU, DAN AKU ATAS PETUNJUKMU DAN JANJIMU SEMAMPUKU, AKU BERLINDUNG KEPADAMU DARI JELEKNYA APA-APA YANG TELAH KUPERBUAT, DAN AKU KEMBALI KEPADAMU BERKAT NIKMATMU (YANG DIBERIKAN) KEPADAKU, DAN AKU MENGETAHUI PADA DOSA-DOSAKU, MAKA AMPUNILAH AKU, SESUNGGUHNYA TIADA YANG BISA MENGAMPUNI DOSA-DOSA SELAIN ENGKAU",
+    "notes": "RAJA ISTIGHFAR INI DIBACA PAGI DAN SORE, KEUTAMAANNYA : DIBACA WAKTU PAGI DAN BILA MENINGGAL SEBELUM SORE, MAKA WAJIB MASUK SURGA. DIBACA WAKTU SORE DAN BILA MENINGGAL SEBELUM PAGI, MAKA WAJIB MASUK SURGA"
+  },
+  {
+    "id": 11,
+    "title": "PR-11",
+    "arabic": "لاَ إِلٰهَ إِلاَّ اللهُ اْلعَلِيُّ اْلحَلِيْمُ لاَ إِلٰهَ إِلاَّ اللهُ رَبُّ اْلعَرْشِ اْلعَظِيْمِ لاَ إِلٰهَ إِلاَّ اللهُ رَبُّ السَّمٰوَاتِ وَ اْلاَرْضِ وَ رَبُّ اْلعَرْشِ اْلكَرِيْمِ",
+    "latin": "Laa ilaaha illallahul’aliyyul haliim, laa ilaaha illallahu rabbil arysyil ‘adziim, laa ilaaha illallahu rabbissamawaati wal ardhi wa rabbil arysil kariim",
+    "translation": "TIADA TUHAN SELAIN ALLOH YANG MAHA LUHUR LAGI MAHA ARIS, TIADA TUHAN SELAIN ALLOH, TUHANNYA SINGGASANA YANG AGUNG, TIADA TUHAN SELAIN ALLOH, TUHANNYA BEBERAPA LANGIT DAN BUMI, DAN TUHANNYA SINGGASANA YANG MULYA",
+    "notes": "DIBACA KETIKA TERTIMPA KESUSAHAN"
+  },
+  {
+    "id": 12,
+    "title": "PR-12",
+    "arabic": "سُبْحَانَ اللهِ\nاَلْحَمْدُ ِللهِ\nاَللهُ أَكْبَرُ\nلاَ إِلٰهَ إِلاَّ اللهُ",
+    "latin": "Subhanallah (100x)\nAlhamdulillah (100x)\nAllahu Akbar (100x)\nLaa ilaaha illallah (100x)",
+    "translation": "MAHA SUCI ALLOH\nSEGALA PUJI BAGI ALLOH\nALLOH MAHA BESAR\nTIADA TUHAN SELAIN ALLOH",
+    "notes": "DZIKIR PAGI DAN SORE (MASING-MASING 100X)\nA. TASBIH = PAHALA HAJI 100X\nB. TAHMID = PAHALA 100 KUDA SABILILLAH/PERANG 100X\nC. TAHLIL = PAHALA MERDEKAKAN 100 BUDAK BANI ISMA’IL\nD. TAKBIR = TIADA BANDINGAN KECUALI YANG BACA SAMA/LEBIH BANYAK"
+  },
+  {
+    "id": 13,
+    "title": "PR-13",
+    "arabic": "اَلْحَمْدُ ِللهِ الَّذِى عَافَانِى مِمَّا ابْتَلاَكَ بِهِ وَ فَضَّلَنِى عَلَى كَثِيْرٍ مِمَّن خَلَقَ تَفْضِيْلاً",
+    "latin": "Alhamdulillaahilladzii ‘aafaanii mimmabtalaaka bihi, wa fadhodhlanii ‘ala katsiirin mimman khalaqa tafdhiilan",
+    "translation": "SEGALA PUJI BAGI ALLOH, YANG TELAH MENYELAMATKAN SAYA DARI APA-APA YANG KAU COBA DENGAN APA-APA, DAN YANG TELAH MEMBERI KEFADLOLAN KEPADAKU DARIPADA ORANG-ORANG YANG ALLOH CIPTAKAN DENGAN SUNGGUH-SUNGGUH MEMBERI KEFADLOLAN",
+    "notes": "DO’A KETIKA MELIHAT ORANG YANG TERTIMPA COBAAN, KEUTAMAANNYA : COBAAN YANG DILIHAT TERSEBUT TIDAK AKAN MENIMPA ORANG YANG MEMBACANYA"
+  }
+]
