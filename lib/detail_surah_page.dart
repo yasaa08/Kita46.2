@@ -1,8 +1,8 @@
 // lib/detail_surah_page.dart
-
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'database_service.dart'; // <--- TAMBAHKAN INI
 
 const Map<int, int> surahToJuzMap = {
   1: 1, 2: 1, 3: 3, 4: 4, 5: 6, 6: 7, 7: 8, 8: 9, 9: 10, 
@@ -61,6 +61,12 @@ class _DetailSurahPageState extends State<DetailSurahPage> {
   void initState() {
     super.initState();
     readJson();
+    // Simpan otomatis ke database saat halaman dibuka
+    DatabaseService().saveLastReadSurah(
+      surahNumber: widget.surahNumber,
+      surahName: widget.surahName,
+      ayahNumber: 1, 
+    );
   }
 
   @override
@@ -75,32 +81,6 @@ class _DetailSurahPageState extends State<DetailSurahPage> {
       appBar: AppBar(
         title: Text(widget.surahName, style: const TextStyle(color: Color(0xFFF5F5F5))),
         iconTheme: const IconThemeData(color: Color(0xFFF5F5F5)),
-        actions: [ 
-          IconButton(
-            icon: const Icon(Icons.play_circle_outline, color: Color(0xFF4DB6AC)), 
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Fitur audio segera hadir!')),
-              );
-            }
-          ),
-          IconButton(
-            icon: const Icon(Icons.bookmark_border, color: Color(0xFF4DB6AC)), 
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Fitur bookmark segera hadir!')),
-              );
-            }
-          ),
-          IconButton(
-            icon: const Icon(Icons.share, color: Color(0xFF4DB6AC)), 
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Fitur share segera hadir!')),
-              );
-            }
-          ),
-        ],
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator(color: Color(0xFF4DB6AC)))
@@ -109,7 +89,6 @@ class _DetailSurahPageState extends State<DetailSurahPage> {
               : ListView.builder(
                   itemCount: numberOfAyahs + 1, 
                   itemBuilder: (context, index) {
-                    
                     if (index == 0) {
                       return Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
@@ -144,17 +123,12 @@ class _DetailSurahPageState extends State<DetailSurahPage> {
                                     ),
                                   ],
                                 ),
-
                                 if (bismillahPre != null)
                                   Padding(
                                     padding: const EdgeInsets.only(top: 20.0),
                                     child: Text(
                                       bismillahPre,
-                                      style: const TextStyle(
-                                        fontFamily: 'LPMQ',
-                                        fontSize: 28, 
-                                        color: Color(0xFFF5F5F5),
-                                      ),
+                                      style: const TextStyle(fontFamily: 'LPMQ', fontSize: 28, color: Color(0xFFF5F5F5)),
                                       textDirection: TextDirection.rtl, 
                                     ),
                                   ),
@@ -164,10 +138,8 @@ class _DetailSurahPageState extends State<DetailSurahPage> {
                         ),
                       );
                     }
-
                     final String verseNumber = index.toString(); 
                     final String arab = arabicText[verseNumber] ?? 'Teks tidak ditemukan';
-
                     return Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
                       child: Row( 
@@ -180,34 +152,19 @@ class _DetailSurahPageState extends State<DetailSurahPage> {
                               children: [
                                 Image.asset( 
                                   'assets/images/ornamenayat1.png', 
-                                  width: 36, 
-                                  height: 36,
-                                  errorBuilder: (context, error, stackTrace) => 
-                                    const Icon(Icons.circle_outlined, color: Color(0xFF4DB6AC), size: 36), 
+                                  width: 36, height: 36,
+                                  errorBuilder: (context, error, stackTrace) => const Icon(Icons.circle_outlined, color: Color(0xFF4DB6AC), size: 36), 
                                 ),
-                                Text(
-                                  verseNumber,
-                                  style: const TextStyle(
-                                    color: Color(0xFFF5F5F5), 
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
+                                Text(verseNumber, style: const TextStyle(color: Color(0xFFF5F5F5), fontSize: 12, fontWeight: FontWeight.bold)),
                               ],
                             ),
                           ),
                           const SizedBox(width: 16), 
-                          
                           Expanded( 
                             child: Text(
                               arab,
                               textAlign: TextAlign.right,
-                              style: const TextStyle(
-                                fontSize: 28, 
-                                fontFamily: 'LPMQ',
-                                color: Color(0xFFF5F5F5), 
-                                height: 1.8, 
-                              ),
+                              style: const TextStyle(fontSize: 28, fontFamily: 'LPMQ', color: Color(0xFFF5F5F5), height: 1.8),
                             ),
                           ),
                         ],

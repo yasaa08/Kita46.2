@@ -1,8 +1,9 @@
 // lib/pr13_detail_page.dart
 import 'package:flutter/material.dart';
+import 'database_service.dart'; // <--- TAMBAHKAN INI
 
 class Pr13DetailPage extends StatefulWidget {
-  final Map<String, dynamic> doaData; // Menerima data doa dari halaman list
+  final Map<String, dynamic> doaData;
 
   const Pr13DetailPage({super.key, required this.doaData});
 
@@ -11,26 +12,26 @@ class Pr13DetailPage extends StatefulWidget {
 }
 
 class _Pr13DetailPageState extends State<Pr13DetailPage> {
-  int _counter = 0; // State untuk menyimpan hitungan
+  int _counter = 0;
 
-  // Fungsi untuk menambah counter
   void _incrementCounter() {
     setState(() {
       _counter++;
-      // Di sini nanti bisa ditambahkan logika untuk limit (misal 100x) jika diperlukan
     });
   }
 
-  // Fungsi untuk menyimpan (saat ini hanya print)
   void _saveCount() {
-    // Di sini nanti kita tambahkan logika penyimpanan (misal pakai shared_preferences)
-    print('Hitungan disimpan: $_counter untuk ${widget.doaData['title']}');
+    // Fungsi ini sekarang bisa dipanggil karena import sudah ada
+    DatabaseService().saveLastDzikir(
+      category: 'PR 13',
+      title: widget.doaData['title'] ?? 'Doa',
+      counter: _counter,
+    );
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Hitungan $_counter disimpan!')),
+      SnackBar(content: Text('Hitungan $_counter disimpan ke Cloud!')),
     );
   }
   
-  // Fungsi untuk reset counter
   void _resetCounter() {
      setState(() {
       _counter = 0; 
@@ -40,10 +41,8 @@ class _Pr13DetailPageState extends State<Pr13DetailPage> {
     );
   }
 
-
   @override
   Widget build(BuildContext context) {
-    // Ambil data dari map yang dikirim
     final String title = widget.doaData['title'] ?? 'Detail Doa';
     final String arabic = widget.doaData['arabic'] ?? '';
     final String latin = widget.doaData['latin'] ?? '';
@@ -57,90 +56,45 @@ class _Pr13DetailPageState extends State<Pr13DetailPage> {
         backgroundColor: Colors.black,
         elevation: 0,
         actions: [
-          // Tombol Reset di AppBar
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            tooltip: 'Reset Hitungan',
-            onPressed: _resetCounter,
-          ),
-          // Tombol Simpan di AppBar
-          IconButton(
-            icon: const Icon(Icons.save_alt),
-            tooltip: 'Simpan Hitungan',
-            onPressed: _saveCount,
-          ),
+          IconButton(icon: const Icon(Icons.refresh), tooltip: 'Reset', onPressed: _resetCounter),
+          IconButton(icon: const Icon(Icons.save_alt), tooltip: 'Simpan', onPressed: _saveCount),
         ],
       ),
-      body: SingleChildScrollView( // Agar bisa di-scroll jika konten panjang
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch, // Rata kiri-kanan
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Teks Arab
             if (arabic.isNotEmpty)
-              Text(
-                arabic,
-                textAlign: TextAlign.right,
-                style: const TextStyle(
-                    fontFamily: 'LPMQ', fontSize: 28, color: Colors.white, height: 1.8),
-              ),
+              Text(arabic, textAlign: TextAlign.right, style: const TextStyle(fontFamily: 'LPMQ', fontSize: 28, color: Colors.white, height: 1.8)),
             const SizedBox(height: 16),
-
-            // Teks Latin
             if (latin.isNotEmpty)
-              Text(
-                latin,
-                style: TextStyle(fontStyle: FontStyle.italic, color: Colors.grey.shade400, fontSize: 16),
-              ),
+              Text(latin, style: TextStyle(fontStyle: FontStyle.italic, color: Colors.grey.shade400, fontSize: 16)),
             const SizedBox(height: 16),
-
-            // Terjemahan
             if (translation.isNotEmpty)
-              Text(
-                translation,
-                style: const TextStyle(color: Colors.white70, fontSize: 16),
-              ),
-            const SizedBox(height: 24), // Jarak lebih besar sebelum keterangan
-
-            // Keterangan / Notes
+              Text(translation, style: const TextStyle(color: Colors.white70, fontSize: 16)),
+            const SizedBox(height: 24),
             if (notes.isNotEmpty)
-              Container( // Beri sedikit background biar beda
+              Container(
                  padding: const EdgeInsets.all(12.0),
-                 decoration: BoxDecoration(
-                   color: Colors.grey.shade900,
-                   borderRadius: BorderRadius.circular(8)
-                 ),
+                 decoration: BoxDecoration(color: Colors.grey.shade900, borderRadius: BorderRadius.circular(8)),
                  child: Column(
                    crossAxisAlignment: CrossAxisAlignment.start,
                    children: [
-                      const Text(
-                        'Keterangan:',
-                        style: TextStyle(fontWeight: FontWeight.bold, color: Colors.tealAccent, fontSize: 14),
-                      ),
+                      const Text('Keterangan:', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.tealAccent, fontSize: 14)),
                       const SizedBox(height: 8),
-                      Text(
-                        notes,
-                        style: const TextStyle(color: Colors.white70, fontSize: 14),
-                      ),
+                      Text(notes, style: const TextStyle(color: Colors.white70, fontSize: 14)),
                    ],
                  ),
               )
           ],
         ),
       ),
-
-      // ================== FLOATING ACTION BUTTON (COUNTER) ==================
-      floatingActionButton: FloatingActionButton.small( // Pakai .small biar kecil
+      floatingActionButton: FloatingActionButton.small(
         onPressed: _incrementCounter,
-        tooltip: 'Tambah Hitungan',
-        backgroundColor: Colors.teal, // Warna tombol
-        child: Text(
-          _counter.toString(), // Tampilkan angka counter
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
-        ),
+        backgroundColor: Colors.teal,
+        child: Text(_counter.toString(), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
       ),
-      // Atur posisi FAB (opsional, bisa diubah)
-      // floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat, 
     );
   }
 }

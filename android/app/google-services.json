@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "343296288430",
+    "project_id": "kita-46-2",
+    "storage_bucket": "kita-46-2.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:343296288430:android:5402af121654556c576f3f",
+        "android_client_info": {
+          "package_name": "com.example.kita_46_2"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAbuAJwhHY1mCgiqlmVGIaYT50AlTl2izU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
