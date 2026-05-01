@@ -23,10 +23,11 @@ android {
     defaultConfig {
         applicationId = "com.example.kita_46_2"
         // UBAH minSdkVersion JADI 21 (WAJIB BUAT FIREBASE)
-        minSdk = 21 
-        targetSdk = flutter.targetSdkVersion
+        minSdk = flutter.minSdkVersion
+        targetSdk = 34
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        multiDexEnabled = true
     }
 
     buildTypes {

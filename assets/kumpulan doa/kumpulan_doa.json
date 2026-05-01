@@ -1,0 +1,98 @@
+[
+  {
+    "id": 1,
+    "title": "Do'a Nabi Yunus",
+    "arabic": "لَا إِلَهَ إِلَّا أَنْتَ سُبْحَانَكَ إِنِّي كُنْتُ مِنَ الظَّالِمِينَ",
+    "latin": "Laa ilaaha illaa anta subhaanaka innii kuntu minadh-dhaalimiin.",
+    "translation": "Tidak ada Tuhan kecuali Engkau, Maha Suci Engkau, sesungguhnya aku tergolong orang-orang yang berbuat dhalim/aniaya.",
+    "notes": "Sumber: QS. Al-Anbiya: 87"
+  },
+  {
+    "id": 2,
+    "title": "Do'a Mohon Ampunan",
+    "arabic": "رَبَّنَا اغْفِرْ لَنَا ذُنُوبَنَا وَإِسْرَافَنَا فِي أَمْرِنَا وَثَبِّتْ أَقْدَامَنَا وَانْصُرْنَا عَلَى الْقَوْمِ الْكَافِرِينَ",
+    "latin": "Rabbanaghfir lanaa dzunuubanaa wa israafanaa fii amrinaa wa tsabbit aqdaamanaa wansurnaa 'alal qoumil kaafiriin.",
+    "translation": "Ya Tuhan kami, ampunilah dosa-dosa kami dan perbuatan kami yang melampaui batas dalam urusan kami dan tetapkanlah telapak kaki kami (di dalam agama), dan tolonglah kami atas orang-orang kafir.",
+    "notes": "Sumber: QS. Ali 'Imran: 147"
+  },
+  {
+    "id": 3,
+    "title": "Do'a Mohon Kebaikan Dunia Akhirat",
+    "arabic": "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
+    "latin": "Rabbanaa aatinaa fid-dunyaa hasanah, wa fil-aakhirati hasanah, wa qinaa 'adzaaban-naar.",
+    "translation": "Wahai Tuhan kami, berilah kami kebaikan di dunia dan di akhirat dan jagalah kami dari siksa neraka.",
+    "notes": "Sumber: QS. Al-Baqarah: 201"
+  },
+  {
+    "id": 4,
+    "title": "Do'a Mohon Segala Kebaikan",
+    "arabic": "رَبِّ إِنِّي لِمَا أَنْزَلْتَ إِلَيَّ مِنْ خَيْرٍ فَقِيرٌ",
+    "latin": "Rabbi innii limaa anzalta illayya min khoirin faqiir.",
+    "translation": "Wahai Tuhanku, sesungguhnya aku orang yang sangat membutuhkan kebaikan yang telah Engkau turunkan kepadaku.",
+    "notes": "Sumber: QS. Al-Qashash: 24"
+  },
+  {
+    "id": 5,
+    "title": "Do'a Mohon Tetap dalam Hidayah",
+    "arabic": "رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا وَهَبْ لَنَا مِنْ لَدُنْكَ رَحْمَةً إِنَّكَ أَنْتَ الْوَهَّابُ",
+    "latin": "Rabbanaa laa tuzigh quluubanaa ba'da idz hadaitanaa wa hab lanaa min ladunka rahmah, innaka antal-wahhaab.",
+    "translation": "Wahai Tuhan kami, janganlah Engkau menyimpangkan hati kami setelah Engkau berikan petunjuk kepada kami, dan karuniakanlah kepada kami rahmat dari sisi-Mu, sesungguhnya Engkau Maha Pemberi.",
+    "notes": "Sumber: QS. Ali 'Imran: 8"
+  },
+  {
+    "id": 6,
+    "title": "Do'a Mohon Dibangunkan Rumah di Surga",
+    "arabic": "رَبِّ ابْنِ لِي عِنْدَكَ بَيْتًا فِي الْجَنَّةِ",
+    "latin": "Rabbibni lii 'indaka baitan fil jannah.",
+    "translation": "Wahai Tuhanku, bangunkanlah untukku sebuah rumah di sisi-Mu dalam surga.",
+    "notes": "Sumber: QS. At-Tahrim: 11"
+  },
+  {
+    "id": 7,
+    "title": "Do'a Mohon Dijadikan Orang Sholih, Dikenang Kebaikannya dan Pewaris Surga",
+    "arabic": "رَبِّ هَبْ لِي حُكْمًا وَأَلْحِقْنِي بِالصَّالِحِينَ . وَاجْعَلْ لِي لِسَانَ صِدْقٍ فِي الْآخِرِينَ . وَاجْعَلْنِي مِنْ وَرَثَةِ جَنَّةِ النَّعِيمِ",
+    "latin": "Robbi hablii hukman wa alhiqnii bish-shoolihiin. Waj-'al lii lisaana shidqin fil-aakhiriin. Waj-'alnii min warotsati jannatin-na'iim.",
+    "translation": "Ya Tuhanku, berikanlah kepadaku hikmah (ilmu dan pemahaman) dan masukkanlah aku ke dalam golongan orang-orang yang saleh. Dan jadikanlah aku buah tutur yang baik bagi orang-orang (yang datang) kemudian. Dan jadikanlah aku termasuk orang-orang yang mewarisi surga yang penuh kenikmatan.",
+    "notes": "Sumber: QS. Asy-Syu'ara: 83-85"
+  },
+  {
+    "id": 8,
+    "title": "Do'a Mohon Agar Digolongkan Orang-orang yang Menyaksikan Kebenaran",
+    "arabic": "Versi 1:\nرَبَّنَا آمَنَّا بِمَا أَنْزَلْتَ وَاتَّبَعْنَا الرَّسُولَ فَاكْتُبْنَا مَعَ الشَّاهِدِينَ\n\nVersi 2:\nرَبَّنَا آمَنَّا فَاكْتُبْنَا مَعَ الشَّاهِدِينَ",
+    "latin": "Versi 1:\nRabbanaa aamannaa bimaa anzalta wattaba'nar-rasuula faktubnaa ma'asy-syaahidiin.\n\nVersi 2:\nRabbanaa aamannaa faktubnaa ma'asy-syaahidiin.",
+    "translation": "Versi 1:\nWahai Tuhan kami, kami telah beriman kepada apa (Al-Qur'an) yang Engkau turunkan dan kami telah mengikuti Rasul, maka catatlah kami bersama golongan orang yang menyaksikan (atas kebenaran Al-Qur'an dan kenabian Muhammad).\n\nVersi 2:\nWahai Tuhan kami, kami telah beriman, maka catatlah kami bersama orang-orang yang menyaksikan (atas kebenaran Al-Qur'an dan kenabian Muhammad).",
+    "notes": "Versi 1 Sumber: QS. Ali 'Imran: 53\nVersi 2 Sumber: QS. Al-Ma'idah: 83"
+  },
+  {
+    "id": 9,
+    "title": "Do'a Memohon Agar Menjadi Hamba yang Pandai Bersyukur",
+    "arabic": "Versi 1:\nرَبِّ أَوْزِعْنِي أَنْ أَشْكُرَ نِعْمَتَكَ الَّتِي أَنْعَمْتَ عَلَيَّ وَعَلَى وَالِدَيَّ وَأَنْ أَعْمَلَ صَالِحًا تَرْضَاهُ وَأَدْخِلْنِي بِرَحْمَتِكَ فِي عِبَادِكَ الصَّالِحِينَ\n\nVersi 2:\nرَبِّ أَوْزِعْنِي أَنْ أَشْكُرَ نِعْمَتَكَ الَّتِي أَنْعَمْتَ عَلَيَّ وَعَلَى وَالِدَيَّ وَأَنْ أَعْمَلَ صَالِحًا تَرْضَاهُ وَأَصْلِحْ لِي فِي ذُرِّيَّتِي * إِنِّي تُبْتُ إِلَيْكَ وَإِنِّي مِنَ الْمُسْلِمِينَ",
+    "latin": "Versi 1:\nRabbi auzi'nii an asykura ni'matakal-latii an'amta 'alayya wa 'alaa waalidayya wa an a'mala shaalihan tardhaahu wa adkhilnii birahmatika fii 'ibaadikash-shaalihiin.\n\nVersi 2:\nRabbi auzi'nii an asykura ni'matakal-latii an'amta 'alayya wa 'alaa waalidayya wa an a'mala shaalihan tardhaahu wa ashlih lii fii dzurriyyatii, innii tubtu ilaika wa innii minal-muslimiin.",
+    "translation": "Versi 1:\nWahai Tuhanku, berikan aku ilham untuk tetap mensyukuri nikmat-Mu yang telah Engkau anugerahkan kepadaku dan kepada kedua orang tuaku dan agar aku mengerjakan kebaikan yang Engkau ridhai dan masukkanlah aku dengan rahmat-Mu ke dalam golongan hamba-hamba-Mu yang shalih.\n\nVersi 2:\nWahai Tuhanku, berilah aku ilham agar aku dapat mensyukuri nikmat-Mu yang telah Engkau anugerahkan kepadaku dan kepada kedua orang tuaku, dan agar aku dapat berbuat kebaikan yang Engkau ridhai dan jadikan anak keturunanku orang-orang yang shalih. Sesungguhnya aku bertaubat kepada-Mu, dan sesungguhnya aku termasuk orang muslim.",
+    "notes": "Versi 1 Sumber: QS. An-Naml: 19\nVersi 2 Sumber: QS. Al-Ahqaf: 15"
+  },
+  {
+    "id": 10,
+    "title": "Do'a Mohon Dimasukkan Golongan Orang Saleh",
+    "arabic": "فَاطِرَ السَّمَاوَاتِ وَالْأَرْضِ أَنْتَ وَلِيِّي فِي الدُّنْيَا وَالْآخِرَةِ تَوَفَّنِي مُسْلِمًا وَأَلْحِقْنِي بِالصَّالِحِينَ",
+    "latin": "Faathiras-samaawaati wal ardh, anta waliyyii fid-dunyaa wal aakhirah, tawaffanii musliman wa alhiqnii bish-shaalihiin.",
+    "translation": "(Wahai Tuhan) pencipta langit dan bumi, Engkaulah kekasihku di dunia dan di akhirat, wafatkanlah aku dalam keadaan muslim dan masukkanlah aku ke dalam golongan orang-orang yang shalih.",
+    "notes": "Sumber: QS. Yusuf: 101"
+  },
+  {
+    "id": 11,
+    "title": "Do'a Mohon Tidak Diberi Beban yang Berat",
+    "arabic": "رَبَّنَا لَا تُؤَاخِذْنَا إِنْ نَسِينَا أَوْ أَخْطَأْنَا ۚ رَبَّنَا $\\overline{M}_{\\overline{9}}$ تَحْمِلْ عَلَيْنَا إِصْرًا كَمَا حَمَلْتَهُ عَلَى الَّذِينَ مِنْ قَبْلِنَا رَبَّنَا وَلَا تُحَمِّلْنَا مَا لَا طَاقَةَ لَنَا بِهِ وَاعْفُ عَنَّا وَاغْفِرْ لَنَا وَارْحَمْنَا أَنْتَ مَوْلَانَا فَانْصُرْنَا عَلَى الْقَوْمِ الْكَافِرِينَ",
+    "latin": "Rabbanaa laa tu'aakhidznaa in nasiinaa au akhtha'naa. Rabbanaa wa laa tahmil 'alainaa ishran kamaa hamaltahuu 'alal-ladziina min qablinaa. Rabbanaa wa laa tuhammilnaa maa laa thaaqata lanaa bih. Wa'fu 'annaa waghfir lanaa warhamnaa, anta maulaanaa fanshurnaa 'alal qaumil kaafiriin.",
+    "translation": "Ya Tuhan kami, janganlah Engkau hukum kami jika kami lupa atau kami tersalah. Ya Tuhan kami, janganlah Engkau bebankan kepada kami beban yang berat sebagaimana Engkau bebankan kepada orang-orang sebelum kami. Ya Tuhan kami, janganlah Engkau pikulkan kepada kami apa yang tak sanggup kami memikulnya. Beri maaflah kami; ampunilah kami; dan rahmatilah kami. Engkaulah Penolong kami, maka tolonglah kami terhadap kaum yang kafir.",
+    "notes": "Sumber: QS. Al-Baqarah: 286"
+  },
+  {
+    "id": 12,
+    "title": "Doa Mohon Diselamatkan dari Neraka",
+    "arabic": "رَبَّنَا اصْرِفْ عَنَّا عَذَابَ جَهَنَّمَ إِنَّ عَذَابَهَا كَانَ غَرَامًا إِنَّهَا سَاءَتْ مُسْتَقَرًّا وَمُقَامًا",
+    "latin": "Rabbana is'rif 'annā 'adhāb Jahannama, innā 'adhābahā kāna gharāman innahā sā'at mustaqarran wa maqāmā.",
+    "translation": "Wahai Tuhan kami, palingkanlah siksa Jahanam dari kami, karena sesungguhnya siksanya itu merusak. Sesungguhnya neraka Jahanam itu seburuk-buruk tempat menetap dan tempat kediaman.",
+    "notes": "QS. Al Furqan: 65-66"
+  }
+]

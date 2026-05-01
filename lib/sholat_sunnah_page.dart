@@ -1,36 +1,27 @@
-// lib/pr13_page.dart
-import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'dart:convert';
 import 'package:flutter/services.dart';
-import 'pr13_detail_page.dart'; 
+import 'detail_sholat_page.dart';
 
-class Pr13Page extends StatefulWidget {
-  const Pr13Page({super.key});
+class SholatSunnahPage extends StatefulWidget {
+  const SholatSunnahPage({super.key});
 
   @override
-  State<Pr13Page> createState() => _Pr13PageState();
+  State<SholatSunnahPage> createState() => _SholatSunnahPageState();
 }
 
-class _Pr13PageState extends State<Pr13Page> {
-  List _pr13List = [];
-  bool _isLoading = true;
+class _SholatSunnahPageState extends State<SholatSunnahPage> {
+  List _listSholat = [];
 
+  // Palet Warna
   final sageColor = const Color(0xFFB2C8BA);
   final surfaceColor = const Color(0xFF242822);
   final bgColor = const Color(0xFF1A1C19);
 
   Future<void> readJson() async {
-    try {
-      final String response = await rootBundle.loadString('assets/PR 13/pr13.json');
-      final data = await json.decode(response);
-      setState(() {
-        _pr13List = data;
-        _isLoading = false;
-      });
-    } catch (e) {
-      print("Error reading PR13 JSON: $e");
-      setState(() => _isLoading = false);
-    }
+    final String response = await rootBundle.loadString('assets/Sholat sunnah/Sholatsunnah.json');
+    final data = await json.decode(response);
+    setState(() => _listSholat = data);
   }
 
   @override
@@ -44,46 +35,45 @@ class _Pr13PageState extends State<Pr13Page> {
     return Scaffold(
       backgroundColor: bgColor,
       appBar: AppBar(
-        title: const Text('PR 13', style: TextStyle(fontWeight: FontWeight.w400)),
+        title: const Text('Sholat Sunnah', style: TextStyle(fontWeight: FontWeight.w400)),
         backgroundColor: bgColor,
         surfaceTintColor: Colors.transparent,
         centerTitle: true,
       ),
-      body: _isLoading
+      body: _listSholat.isEmpty
           ? Center(child: CircularProgressIndicator(color: sageColor))
-          : ListView.builder( 
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16), 
-              itemCount: _pr13List.length,
+          : ListView.builder(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+              itemCount: _listSholat.length,
               itemBuilder: (context, index) {
-                final doa = _pr13List[index];
-
+                final item = _listSholat[index];
                 return Container(
                   margin: const EdgeInsets.only(bottom: 12),
                   child: ElevatedButton(
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => Pr13DetailPage(doaData: doa)),
+                        MaterialPageRoute(builder: (context) => DetailSholatPage(sholatData: item)),
                       );
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: surfaceColor,
+                      backgroundColor: surfaceColor, // Warna Card
                       foregroundColor: Colors.white,
-                      elevation: 0,
+                      elevation: 0, // Datar (tanpa bayangan keras)
                       padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)), // Lengkungan Pixel
                     ),
                     child: Row(
                       children: [
                         CircleAvatar(
                           backgroundColor: sageColor.withValues(alpha: 0.15),
                           radius: 20,
-                          child: Icon(Icons.fingerprint, color: sageColor, size: 20),
+                          child: Icon(Icons.wb_sunny_outlined, color: sageColor, size: 20),
                         ),
                         const SizedBox(width: 16),
                         Expanded(
                           child: Text(
-                            doa['title'] ?? 'PR-${doa['id']}', 
+                            item['title'] ?? 'Nama Sholat',
                             style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                           ),
                         ),

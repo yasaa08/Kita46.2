@@ -1,5 +1,4 @@
 // lib/daftar_surah_page.dart
-
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -18,6 +17,11 @@ class _DaftarSurahPageState extends State<DaftarSurahPage> {
   bool _isLoading = true;
   final TextEditingController _searchController = TextEditingController();
 
+  // Palet Warna
+  final sageColor = const Color(0xFFB2C8BA);
+  final surfaceColor = const Color(0xFF242822);
+  final bgColor = const Color(0xFF1A1C19);
+
   Future<void> readJson() async {
     try {
       final String response = await rootBundle.loadString('assets/list_surah.json');
@@ -29,9 +33,7 @@ class _DaftarSurahPageState extends State<DaftarSurahPage> {
       });
     } catch (e) {
       print("Error reading list_surah JSON: $e");
-      setState(() {
-        _isLoading = false;
-      });
+      setState(() => _isLoading = false);
     }
   }
 
@@ -46,18 +48,14 @@ class _DaftarSurahPageState extends State<DaftarSurahPage> {
         return nameLower.contains(searchLower);
       }).toList();
     }
-    setState(() {
-      _filteredSurah = results;
-    });
+    setState(() => _filteredSurah = results);
   }
 
   @override
   void initState() {
     super.initState();
     readJson();
-    _searchController.addListener(() {
-      _filterSurah(_searchController.text);
-    });
+    _searchController.addListener(() => _filterSurah(_searchController.text));
   }
 
   @override
@@ -69,29 +67,28 @@ class _DaftarSurahPageState extends State<DaftarSurahPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF121212), 
+      backgroundColor: bgColor, 
       appBar: AppBar(
-        title: const Text('Daftar Surah', style: TextStyle(color: Color(0xFFF5F5F5))),
-        iconTheme: const IconThemeData(color: Color(0xFFF5F5F5)),
+        title: const Text('Daftar Surah', style: TextStyle(fontWeight: FontWeight.w400)),
+        backgroundColor: bgColor,
+        surfaceTintColor: Colors.transparent,
+        centerTitle: true,
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator(color: Color(0xFF4DB6AC)))
+          ? Center(child: CircularProgressIndicator(color: sageColor))
           : Column( 
               children: [
                 Padding(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),
                   child: TextField(
                     controller: _searchController,
-                    style: const TextStyle(color: Color(0xFFF5F5F5)), 
+                    style: const TextStyle(color: Colors.white), 
                     decoration: InputDecoration(
                       filled: true,
-                      fillColor: const Color(0xFF1E1E1E), 
+                      fillColor: surfaceColor, // Warna kotak pencarian
                       hintText: 'Cari Surah...',
-                      hintStyle: const TextStyle(color: Color(0xFFA0A0A0)), 
-                      prefixIcon: const Icon(
-                        Icons.search, 
-                        color: Color(0xFFA0A0A0)
-                      ),
+                      hintStyle: const TextStyle(color: Colors.white38), 
+                      prefixIcon: const Icon(Icons.search, color: Colors.white38),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(30.0), 
                         borderSide: BorderSide.none, 
@@ -100,39 +97,31 @@ class _DaftarSurahPageState extends State<DaftarSurahPage> {
                     ),
                   ),
                 ),
+                const SizedBox(height: 8),
                 Expanded( 
                   child: ListView.separated( 
                     itemCount: _filteredSurah.length, 
                     itemBuilder: (context, index) {
                       final surah = _filteredSurah[index];
                       return ListTile(
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
                         leading: CircleAvatar(
-                          radius: 20, 
-                          backgroundColor: const Color(0xFF1E1E1E), // Soft dark
+                          radius: 22, 
+                          backgroundColor: sageColor.withValues(alpha: 0.15), // Background nomor surah
                           child: Text(
                             surah["number"].toString(),
-                            style: const TextStyle(
-                              color: Color(0xFF4DB6AC), // Teks nomor warna Soft Teal
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                            ),
+                            style: TextStyle(color: sageColor, fontSize: 13, fontWeight: FontWeight.bold),
                           ),
                         ),
                         title: Text(
                           surah["name"],
-                          style: const TextStyle(
-                            color: Color(0xFFF5F5F5), 
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500, 
-                          ),
+                          style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),
                         ),
                         subtitle: Text(
-                          '${surah["revelation"]} - ${surah["numberOfAyahs"]} Ayat',
-                          style: const TextStyle(
-                            color: Color(0xFFA0A0A0), 
-                            fontSize: 14,
-                          ),
+                          '${surah["revelation"]} • ${surah["numberOfAyahs"]} Ayat',
+                          style: const TextStyle(color: Colors.white54, fontSize: 13),
                         ),
+                        trailing: const Icon(Icons.arrow_forward_ios_rounded, color: Colors.white12, size: 14),
                         onTap: () {
                           Navigator.push(
                             context,
@@ -146,12 +135,11 @@ class _DaftarSurahPageState extends State<DaftarSurahPage> {
                         },
                       );
                     },
-                    separatorBuilder: (context, index) => const Divider(
-                      color: Color(0xFF2C2C2C), // Garis pemisah soft
-                      thickness: 1,
+                    separatorBuilder: (context, index) => Divider(
+                      color: Colors.white.withValues(alpha: 0.05), // Garis pemisah sangat tipis
                       height: 1, 
-                      indent: 72, 
-                      endIndent: 16,
+                      indent: 76, 
+                      endIndent: 20,
                     ),
                   ),
                 ),

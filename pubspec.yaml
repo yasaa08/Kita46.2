@@ -30,7 +30,7 @@ dev_dependencies:
 flutter_launcher_icons:
   android: "launcher_icon"
   ios: true
-  image_path: "assets/images/Merahldii.png"
+  image_path: "assets/images/kita462logobg.png"
   min_sdk_android: 21
 
 # Konfigurasi khusus flutter (sejajar di kiri)
@@ -44,9 +44,10 @@ flutter:
     - assets/list_surah.json
     - assets/images/
     - "assets/PR 13/pr13.json"
+    - "assets/Sholat sunnah/Sholatsunnah.json"
+    - "assets/kumpulan doa/kumpulan_doa.json"
 
-  # FONT KITA LUPAKAN DULU BIAR GAK ERROR
-  # fonts:
-  #   - family: LPMQ
-  #     fonts:
-  #       - asset: assets/fonts/LPMQ.ttf
+  fonts:
+      - family: LPMQ
+        fonts:
+          - asset: assets/fonts/LPMQ.ttf

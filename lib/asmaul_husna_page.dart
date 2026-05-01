@@ -15,6 +15,11 @@ class _AsmaulHusnaPageState extends State<AsmaulHusnaPage> {
   List _asmaulHusna = [];
   bool _isLoading = true;
 
+  // Palet Warna Khas Pixel
+  final sageColor = const Color(0xFFB2C8BA);
+  final surfaceColor = const Color(0xFF242822);
+  final bgColor = const Color(0xFF1A1C19);
+
   Future<void> readJson() async {
     try {
       final String response = await rootBundle.loadString('assets/Asmaul husna/asmaul_husna.json');
@@ -40,25 +45,43 @@ class _AsmaulHusnaPageState extends State<AsmaulHusnaPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF121212),
+      backgroundColor: bgColor,
       appBar: AppBar(
-        title: const Text('Asmaul Husna', style: TextStyle(color: Color(0xFFF5F5F5))),
-        iconTheme: const IconThemeData(color: Color(0xFFF5F5F5)),
+        title: const Text('Asmaul Husna', style: TextStyle(fontWeight: FontWeight.w400)),
+        backgroundColor: bgColor,
+        surfaceTintColor: Colors.transparent,
+        centerTitle: true,
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator(color: Color(0xFF4DB6AC)))
+          ? Center(child: CircularProgressIndicator(color: sageColor))
           : GridView.builder(
-              padding: const EdgeInsets.all(12.0),
+              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2, 
-                crossAxisSpacing: 12.0,
-                mainAxisSpacing: 12.0,
+                crossAxisSpacing: 16.0,
+                mainAxisSpacing: 16.0,
                 childAspectRatio: 1.0, 
               ),
               itemCount: _asmaulHusna.length,
               itemBuilder: (context, index) {
                 final item = _asmaulHusna[index];
-                return AsmaulHusnaCard(itemData: item);
+                
+                // ANIMASI: Membungkus kartu agar muncul bergantian (staggered)
+                return TweenAnimationBuilder(
+                  // Efek delay berdasarkan index agar muncul satu-persatu
+                  duration: Duration(milliseconds: 300 + (index % 10 * 100)),
+                  tween: Tween<double>(begin: 0.0, end: 1.0),
+                  builder: (context, double value, child) {
+                    return Opacity(
+                      opacity: value,
+                      child: Transform.scale(
+                        scale: 0.8 + (0.2 * value), // Membesar dari 0.8 ke 1.0
+                        child: child,
+                      ),
+                    );
+                  },
+                  child: AsmaulHusnaCard(itemData: item),
+                );
               },
             ),
     );
@@ -71,55 +94,82 @@ class AsmaulHusnaCard extends StatelessWidget {
   const AsmaulHusnaCard({super.key, required this.itemData});
 
   void _showDetailBottomSheet(BuildContext context) {
+    final sageColor = const Color(0xFFB2C8BA);
+    final surfaceColor = const Color(0xFF242822);
+
     showModalBottomSheet(
       context: context,
-      backgroundColor: const Color(0xFF1E1E1E),
+      backgroundColor: surfaceColor,
+      isScrollControlled: true, 
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
       ),
       builder: (context) {
         return Padding(
-          padding: const EdgeInsets.all(24.0),
+          padding: const EdgeInsets.only(left: 24.0, right: 24.0, bottom: 40.0, top: 12.0),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                itemData['arabic'],
-                style: const TextStyle(
-                  fontFamily: 'LPMQ', 
-                  fontSize: 32, 
-                  color: Color(0xFF4DB6AC)
+              Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.white24,
+                  borderRadius: BorderRadius.circular(2),
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 32),
+              Text(
+                itemData['arabic'],
+                style: TextStyle(
+                  fontFamily: 'LPMQ', 
+                  fontSize: 36, 
+                  color: sageColor,
+                  height: 1.5,
+                ),
+              ),
+              const SizedBox(height: 12),
               Text(
                 itemData['latin'],
                 style: const TextStyle(
                   fontSize: 18, 
-                  color: Color(0xFFF5F5F5), 
+                  color: Colors.white, 
                   fontWeight: FontWeight.bold
                 ),
               ),
-              const Divider(color: Color(0xFF2C2C2C), height: 32),
-              const Text(
-                'Arti:',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold, 
-                  color: Color(0xFF4DB6AC), 
-                  fontSize: 14
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 24.0),
+                child: Divider(color: Colors.white.withValues(alpha: 0.05), height: 1),
+              ),
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF1A1C19), 
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Column(
+                  children: [
+                    Text(
+                      'Arti:',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600, 
+                        color: sageColor, 
+                        fontSize: 14
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      itemData['translation_id'],
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        color: Colors.white70, 
+                        fontSize: 15,
+                        height: 1.5,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 8),
-              Text(
-                itemData['translation_id'],
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontStyle: FontStyle.italic, 
-                  color: Color(0xFFE0E0E0), 
-                  fontSize: 16
-                ),
-              ),
-              const SizedBox(height: 24),
             ],
           ),
         );
@@ -129,17 +179,17 @@ class AsmaulHusnaCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      color: const Color(0xFF1E1E1E), 
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
-        side: const BorderSide(color: Color(0xFF2C2C2C), width: 1),
-      ),
+    final sageColor = const Color(0xFFB2C8BA);
+    final surfaceColor = const Color(0xFF242822);
+
+    return Material(
+      color: surfaceColor, 
+      borderRadius: BorderRadius.circular(24), 
       clipBehavior: Clip.antiAlias, 
       child: InkWell( 
         onTap: () => _showDetailBottomSheet(context), 
         child: Padding(
-          padding: const EdgeInsets.all(12.0), 
+          padding: const EdgeInsets.all(16.0), 
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center, 
             crossAxisAlignment: CrossAxisAlignment.stretch, 
@@ -147,19 +197,20 @@ class AsmaulHusnaCard extends StatelessWidget {
               Text(
                 itemData['arabic'],
                 textAlign: TextAlign.center,
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: 'LPMQ',
-                  fontSize: 24, 
-                  color: Color(0xFFF5F5F5),
+                  fontSize: 26, 
+                  color: sageColor,
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 12),
               Text(
                 itemData['latin'],
                 textAlign: TextAlign.center,
                 style: const TextStyle(
-                  fontSize: 12, 
-                  color: Color(0xFFA0A0A0),
+                  fontSize: 13, 
+                  fontWeight: FontWeight.w500,
+                  color: Colors.white70,
                 ),
               ),
             ],
