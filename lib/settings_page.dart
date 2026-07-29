@@ -108,7 +108,7 @@ class _SettingsPageState extends State<SettingsPage> {
             const Text("Kita 46.2",
                 style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
             const SizedBox(height: 6),
-            const Text("Versi 1.1.0",
+            const Text("Versi 1.1.5",
                 style: TextStyle(color: Colors.white38, fontSize: 12)),
             const SizedBox(height: 20),
             const Text(
@@ -219,8 +219,6 @@ class _SettingsPageState extends State<SettingsPage> {
             surface: surface,
             child: Column(
               children: [
-
-
                 // Font Size Arab
                 Padding(
                   padding:
@@ -370,7 +368,8 @@ class _SettingsPageState extends State<SettingsPage> {
                   title: "Beri Rating",
                   subtitle: "Bantu kami berkembang",
                   textColor: textColor,
-                  onTap: () => showTopNotification(context, "Fitur segera hadir!"),
+                  onTap: () =>
+                      showTopNotification(context, "Fitur segera hadir!"),
                 ),
                 _divider(textColor),
                 _buildTappableTile(
@@ -379,7 +378,8 @@ class _SettingsPageState extends State<SettingsPage> {
                   title: "Bagikan Aplikasi",
                   subtitle: "Ajak temanmu belajar",
                   textColor: textColor,
-                  onTap: () => showTopNotification(context, "Membuka menu berbagi..."),
+                  onTap: () =>
+                      showTopNotification(context, "Membuka menu berbagi..."),
                 ),
               ],
             ),
@@ -404,7 +404,8 @@ class _SettingsPageState extends State<SettingsPage> {
                       color: sageColor.withOpacity(0.15),
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(Icons.volunteer_activism_rounded, color: sageColor),
+                    child: Icon(Icons.volunteer_activism_rounded,
+                        color: sageColor),
                   ),
                   Text(
                     "Dukung Operasional Kita",
@@ -443,7 +444,8 @@ class _SettingsPageState extends State<SettingsPage> {
                     ),
                     child: const Text(
                       "Donasi via Saweria",
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                     ),
                   ),
                 ],
