@@ -1,14 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- Ubah ke warna background gelap aplikasi (#1A1C19) -->
     <item>
         <color android:color="#1A1C19"/>
-    </item>
-
-    <!-- Aktifkan logo di tengah -->
-    <item>
-        <bitmap
-            android:gravity="center"
-            android:src="@mipmap/launcher_icon" />
     </item>
 </layer-list>

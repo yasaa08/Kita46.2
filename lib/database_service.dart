@@ -31,9 +31,8 @@ class DatabaseService {
     }, SetOptions(merge: true));
   }
 
-  // 4. Simpan riwayat terakhir dzikir (PR 13)
+  // 4. Simpan ringkasan dzikir PR 13 (format: last_pr13_title + last_pr13_count)
   Future<void> saveLastDzikir({
-    required String category, 
     required String title,
     required int counter,
   }) async {
@@ -41,12 +40,8 @@ class DatabaseService {
     if (uid == null || isGuest) return;
 
     await _db.collection('users').doc(uid).set({
-      'last_dzikir': {
-        'category': category,
-        'title': title,
-        'counter': counter,
-        'updated_at': FieldValue.serverTimestamp(),
-      }
+      'last_pr13_title': title,
+      'last_pr13_count': counter,
     }, SetOptions(merge: true));
   }
 
@@ -62,43 +57,47 @@ class DatabaseService {
 
 // FUNGSI GLOBAL: Dialog untuk membatasi fitur Tamu
 void tampilkanDialogLogin(BuildContext context) {
+  final surface = const Color(0xFF242822);
+  final textColor = Colors.white;
+  
   showDialog(
     context: context,
     builder: (context) => AlertDialog(
-      backgroundColor: const Color(0xFF1E1E1E),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      title: const Row(
+      backgroundColor: surface,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+      title: Row(
         children: [
-          Icon(Icons.lock_outline, color: Colors.orange),
-          SizedBox(width: 10),
-          Text("Akses Terbatas", style: TextStyle(color: Colors.white)),
+          const Icon(Icons.lock_outline, color: Colors.orange),
+          const SizedBox(width: 10),
+          Text("Akses Terbatas", style: TextStyle(color: textColor)),
         ],
       ),
-      content: const Text(
+      content: Text(
         "Fitur simpan hanya tersedia untuk pengguna yang sudah login. Yuk masuk pakai Google agar riwayatmu aman!", 
-        style: TextStyle(color: Colors.grey)
+        style: TextStyle(color: textColor.withOpacity(0.6))
       ),
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context), 
-          child: const Text("Nanti saja", style: TextStyle(color: Colors.white38))
+          child: Text("Nanti saja", style: TextStyle(color: textColor.withOpacity(0.4)))
         ),
-        // Di dalam file database_service.dart
-ElevatedButton(
-  onPressed: () async {
-    await FirebaseAuth.instance.signOut();
-    if (context.mounted) {
-      // Ganti Navigator.pushNamedAndRemoveUntil dengan ini:
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (context) => const LoginPage()),
-        (route) => false,
-      );
-    }
-  }, 
-  style: ElevatedButton.styleFrom(backgroundColor: Colors.teal),
-  child: const Text("Login Sekarang", style: TextStyle(color: Colors.white)),
-),
+        ElevatedButton(
+          onPressed: () async {
+            await FirebaseAuth.instance.signOut();
+            if (context.mounted) {
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (context) => const LoginPage()),
+                (route) => false,
+              );
+            }
+          }, 
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color(0xFFB2C8BA),
+            foregroundColor: const Color(0xFF1A1C19),
+          ),
+          child: const Text("Login Sekarang"),
+        ),
       ],
     ),
   );

@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'app_settings.dart';
+import 'login_page.dart';
+import 'main.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -11,75 +17,105 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   final user = FirebaseAuth.instance.currentUser;
-  
-  // Palet warna yang konsisten dengan HomePage
+  final AppSettings _settings = AppSettings();
+
   final Color sageColor = const Color(0xFFB2C8BA);
   final Color surfaceColor = const Color(0xFF242822);
   final Color bgColor = const Color(0xFF1A1C19);
 
-  // FUNGSI: Hapus Riwayat Baca (Resume Data) di Firestore
+  @override
+  void initState() {
+    super.initState();
+    _settings.addListener(_onSettingsChange);
+  }
+
+  @override
+  void dispose() {
+    _settings.removeListener(_onSettingsChange);
+    super.dispose();
+  }
+
+  void _onSettingsChange() => setState(() {});
+
   Future<void> _clearHistory() async {
     if (user == null) return;
     try {
-      await FirebaseFirestore.instance.collection('users').doc(user!.uid).update({
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user!.uid)
+          .update({
         'last_read_surah': FieldValue.delete(),
         'last_pr13_title': FieldValue.delete(),
         'last_pr13_count': FieldValue.delete(),
       });
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("Riwayat berhasil dibersihkan"), 
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
+        showTopNotification(context, "Riwayat berhasil dibersihkan");
       }
     } catch (e) {
       debugPrint("Gagal hapus riwayat: $e");
     }
   }
 
-  // FUNGSI: Bagikan Aplikasi
-  void _shareApp() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Membuka menu berbagi..."), behavior: SnackBarBehavior.floating),
-    );
-  }
-
-  // FUNGSI: Buka Instagram[cite: 2]
-  void _launchInstagram() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Menuju Instagram @Kita46.2..."), behavior: SnackBarBehavior.floating),
-    );
-  }
-
-  // FUNGSI: Dialog Tentang Aplikasi[cite: 2]
-  void _showAboutApp() {
+  void _showConfirmDialog(String title, String content, VoidCallback onConfirm,
+      {Color confirmColor = Colors.redAccent}) {
+    const surface = Color(0xFF242822);
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: surfaceColor,
+        backgroundColor: surface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+        title: Text(title),
+        content: Text(content, style: const TextStyle(color: Colors.white70)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Batal", style: TextStyle(color: Colors.white38)),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              onConfirm();
+            },
+            child: Text("Ya, Lanjut", style: TextStyle(color: confirmColor)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showAboutApp() {
+    const surface = Color(0xFF242822);
+    const bg = Color(0xFF1A1C19);
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              width: 80, height: 80,
+              width: 80,
+              height: 80,
               decoration: BoxDecoration(
-                color: sageColor.withOpacity(0.1), 
+                color: sageColor.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Icon(Icons.info_outline, color: sageColor, size: 40),
             ),
             const SizedBox(height: 20),
-            const Text("Kita 46.2", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
-            const Text("Versi 1.0.2", style: TextStyle(color: Colors.white38, fontSize: 12)),
+            const Text("Kita 46.2",
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 6),
+            const Text("Versi 1.1.0",
+                style: TextStyle(color: Colors.white38, fontSize: 12)),
             const SizedBox(height: 20),
             const Text(
-              "Kita 46.2 adalah platform all-in-one buat ibadah yang ngeganti buku fisik jadi digital, jadi lebih praktis dan gampang diakses kapan aja.",
+              "Kita 46.2 adalah platform all-in-one ibadah yang menggantikan buku fisik jadi digital — lebih praktis dan mudah diakses kapan saja.",
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.white70, fontSize: 13, height: 1.5),
+              style:
+                  TextStyle(color: Colors.white70, fontSize: 13, height: 1.5),
             ),
             const SizedBox(height: 24),
             SizedBox(
@@ -87,9 +123,7 @@ class _SettingsPageState extends State<SettingsPage> {
               child: FilledButton(
                 onPressed: () => Navigator.pop(context),
                 style: FilledButton.styleFrom(
-                  backgroundColor: sageColor, 
-                  foregroundColor: bgColor,
-                ),
+                    backgroundColor: sageColor, foregroundColor: bg),
                 child: const Text("Tutup"),
               ),
             ),
@@ -99,168 +133,476 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  // FUNGSI: Dialog Konfirmasi (Hapus/Logout)[cite: 2]
-  void _showConfirmDialog(String title, String content, VoidCallback onConfirm) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: surfaceColor,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
-        title: Text(title),
-        content: Text(content, style: const TextStyle(color: Colors.white70)),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context), 
-            child: const Text("Batal", style: TextStyle(color: Colors.white38)),
-          ),
-          TextButton(
-            onPressed: () { 
-              Navigator.pop(context); 
-              onConfirm(); 
-            }, 
-            child: const Text("Ya, Lanjut", style: TextStyle(color: Colors.redAccent)),
-          ),
-        ],
-      ),
-    );
+  Future<void> _logout() async {
+    await FirebaseAuth.instance.signOut();
+    if (mounted) {
+      Navigator.of(context).pushAndRemoveUntil(
+        buildSlideRoute(const LoginPage()),
+        (route) => false,
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    const bg = Color(0xFF1A1C19);
+    const surface = Color(0xFF242822);
+    const textColor = Colors.white;
+
     return Scaffold(
-      backgroundColor: bgColor,
+      backgroundColor: bg,
       appBar: AppBar(
-        title: const Text("Pengaturan", style: TextStyle(fontSize: 18)),
+        title: Text("Pengaturan",
+            style: TextStyle(fontSize: 18, color: textColor)),
         backgroundColor: Colors.transparent,
         centerTitle: true,
       ),
       body: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
         children: [
-          // KATEGORI: AKUN[cite: 2]
-          _buildSectionTitle("Akun"),
+          // ── Profil Akun ────────────────────────────────────────────
+          _sectionTitle("Akun", textColor),
           Container(
             padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(color: surfaceColor, borderRadius: BorderRadius.circular(24)),
+            decoration: BoxDecoration(
+                color: surface, borderRadius: BorderRadius.circular(24)),
             child: Row(
               children: [
                 CircleAvatar(
                   radius: 28,
                   backgroundColor: sageColor.withOpacity(0.2),
-                  backgroundImage: user?.photoURL != null ? NetworkImage(user!.photoURL!) : null,
-                  child: user?.photoURL == null ? Icon(Icons.person, color: sageColor) : null,
+                  backgroundImage: user?.photoURL != null
+                      ? NetworkImage(user!.photoURL!)
+                      : null,
+                  child: user?.photoURL == null
+                      ? Icon(Icons.person, color: sageColor)
+                      : null,
                 ),
                 const SizedBox(width: 16),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(user?.displayName ?? "Hamba Allah", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                      Text(user?.email ?? "Tamu", style: const TextStyle(color: Colors.white38, fontSize: 12)),
+                      Text(
+                        user?.displayName ?? "Hamba Allah",
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            color: textColor),
+                      ),
+                      Text(
+                        user?.isAnonymous == true
+                            ? "Mode Tamu"
+                            : (user?.email ?? "-"),
+                        style: TextStyle(
+                            color: textColor.withOpacity(0.4), fontSize: 12),
+                      ),
+                    ],
+                  ),
+                ),
+                if (user?.isAnonymous == true)
+                  TextButton(
+                    onPressed: () => Navigator.push(
+                        context, buildSlideRoute(const LoginPage())),
+                    child: Text("Login",
+                        style: TextStyle(color: sageColor, fontSize: 13)),
+                  ),
+              ],
+            ),
+          ).animate().fadeIn(duration: 350.ms),
+
+          const SizedBox(height: 28),
+
+          // ── Tampilan ────────────────────────────────────────────────
+          _sectionTitle("Tampilan", textColor),
+          _buildCard(
+            surface: surface,
+            child: Column(
+              children: [
+
+
+                // Font Size Arab
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(children: [
+                        Container(
+                          width: 38,
+                          height: 38,
+                          decoration: BoxDecoration(
+                            color: sageColor.withOpacity(0.12),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Icon(Icons.text_fields_rounded,
+                              color: sageColor, size: 20),
+                        ),
+                        const SizedBox(width: 14),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text("Ukuran Font Arab",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w500,
+                                      color: textColor)),
+                              Text(
+                                  "Ukuran: ${_settings.arabicFontSize.toInt()}px",
+                                  style: TextStyle(
+                                      color: textColor.withOpacity(0.4),
+                                      fontSize: 12)),
+                            ],
+                          ),
+                        ),
+                      ]),
+                      Slider(
+                        value: _settings.arabicFontSize,
+                        min: 20,
+                        max: 40,
+                        divisions: 4,
+                        activeColor: sageColor,
+                        inactiveColor: sageColor.withOpacity(0.2),
+                        onChanged: (val) async {
+                          if (_settings.hapticEnabled) {
+                            HapticFeedback.selectionClick();
+                          }
+                          await _settings.setArabicFontSize(val);
+                        },
+                      ),
+                      // Preview
+                      Center(
+                        child: Text(
+                          "بِسْمِ اللَّهِ",
+                          style: TextStyle(
+                            fontFamily: 'LPMQ',
+                            fontSize: _settings.arabicFontSize,
+                            color: sageColor,
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ),
               ],
             ),
-          ),
+          ).animate().fadeIn(delay: 50.ms, duration: 350.ms),
 
-          const SizedBox(height: 32),
+          const SizedBox(height: 24),
 
-          // KATEGORI: IBADAH & DATA[cite: 2]
-          _buildSectionTitle("Ibadah & Data"),
-          _buildSettingTile(
-            icon: Icons.history_rounded,
-            title: "Bersihkan Riwayat Baca",
-            subtitle: "Menghapus data resume di halaman depan",
-            onTap: () => _showConfirmDialog(
-              "Hapus Riwayat", 
-              "Semua progres terakhir kamu di Quran & PR 13 akan dihapus.", 
-              _clearHistory,
+          // ── Bacaan ─────────────────────────────────────────────────
+          _sectionTitle("Bacaan", textColor),
+          _buildCard(
+            surface: surface,
+            child: _buildSwitchTile(
+              icon: Icons.translate_rounded,
+              iconColor: const Color(0xFFD2E0FB),
+              title: "Tampilkan Terjemahan",
+              subtitle: "Terjemahan ayat Al-Qur'an",
+              value: _settings.showTranslation,
+              textColor: textColor,
+              onChanged: (val) => _settings.setShowTranslation(val),
             ),
-          ),
-          _buildSettingTile(
-            icon: Icons.text_fields_rounded,
-            title: "Ukuran Font Arab",
-            subtitle: "Sesuaikan kenyamanan membaca ayat",
-            onTap: () {
-              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Fitur Font segera hadir!")));
-            },
-          ),
+          ).animate().fadeIn(delay: 100.ms, duration: 350.ms),
 
-          const SizedBox(height: 32),
+          const SizedBox(height: 24),
 
-          // KATEGORI: DUKUNGAN & SOSMED[cite: 2]
-          _buildSectionTitle("Dukungan & Sosial Media"),
-          _buildSettingTile(
-            icon: Icons.share_rounded,
-            title: "Bagikan Aplikasi",
-            subtitle: "Ajak orang lain untuk beribadah bersama",
-            onTap: _shareApp,
-          ),
-          _buildSettingTile(
-            icon: Icons.camera_alt_outlined,
-            title: "Instagram Kami",
-            subtitle: "Follow untuk info dan update terbaru",
-            onTap: _launchInstagram,
-          ),
-          _buildSettingTile(
-            icon: Icons.info_outline_rounded,
-            title: "Tentang Aplikasi",
-            subtitle: "Kenali lebih dekat Kita 46.2",
-            onTap: _showAboutApp,
-          ),
+          // ── Interaksi ──────────────────────────────────────────────
+          _sectionTitle("Interaksi", textColor),
+          _buildCard(
+            surface: surface,
+            child: _buildSwitchTile(
+              icon: Icons.vibration_rounded,
+              iconColor: const Color(0xFFCDE8E5),
+              title: "Haptic Feedback",
+              subtitle: "Getaran saat menekan tombol",
+              value: _settings.hapticEnabled,
+              textColor: textColor,
+              onChanged: (val) => _settings.setHaptic(val),
+            ),
+          ).animate().fadeIn(delay: 150.ms, duration: 350.ms),
 
-          const SizedBox(height: 32),
+          const SizedBox(height: 24),
 
-          // KATEGORI: LAINNYA[cite: 2]
-          _buildSectionTitle("Lainnya"),
-          _buildSettingTile(
-            icon: Icons.logout_rounded,
-            title: "Keluar Akun",
-            subtitle: "Logout dari perangkat ini",
-            color: Colors.redAccent,
-            onTap: () => _showConfirmDialog("Logout", "Kamu yakin mau keluar?", () async {
-              await FirebaseAuth.instance.signOut();
-              if (mounted) Navigator.pushReplacementNamed(context, '/login');
-            }),
-          ),
-          
-          const SizedBox(height: 40),
-          const Center(child: Text("Kita 46.2 • Versi 1.0.2", style: TextStyle(color: Colors.white12, fontSize: 12))),
+          // ── Data & Riwayat ────────────────────────────────────────
+          _sectionTitle("Data & Riwayat", textColor),
+          _buildCard(
+            surface: surface,
+            child: Column(
+              children: [
+                _buildTappableTile(
+                  icon: Icons.history_rounded,
+                  iconColor: const Color(0xFFFFE5E5),
+                  title: "Bersihkan Riwayat Baca",
+                  subtitle: "Hapus data resume Quran & PR 13",
+                  textColor: textColor,
+                  onTap: () => _showConfirmDialog(
+                    "Hapus Riwayat",
+                    "Semua progres terakhir di Quran & PR 13 akan dihapus.",
+                    _clearHistory,
+                  ),
+                ),
+              ],
+            ),
+          ).animate().fadeIn(delay: 200.ms, duration: 350.ms),
+
+          const SizedBox(height: 24),
+
+          // ── Tentang ────────────────────────────────────────────────
+          _sectionTitle("Tentang", textColor),
+          _buildCard(
+            surface: surface,
+            child: Column(
+              children: [
+                _buildTappableTile(
+                  icon: Icons.info_outline_rounded,
+                  iconColor: sageColor,
+                  title: "Tentang Aplikasi",
+                  subtitle: "Versi 1.1.0",
+                  textColor: textColor,
+                  onTap: _showAboutApp,
+                ),
+                _divider(textColor),
+                _buildTappableTile(
+                  icon: Icons.star_border_rounded,
+                  iconColor: const Color(0xFFEADFB4),
+                  title: "Beri Rating",
+                  subtitle: "Bantu kami berkembang",
+                  textColor: textColor,
+                  onTap: () => showTopNotification(context, "Fitur segera hadir!"),
+                ),
+                _divider(textColor),
+                _buildTappableTile(
+                  icon: Icons.share_rounded,
+                  iconColor: const Color(0xFFD2E0FB),
+                  title: "Bagikan Aplikasi",
+                  subtitle: "Ajak temanmu belajar",
+                  textColor: textColor,
+                  onTap: () => showTopNotification(context, "Membuka menu berbagi..."),
+                ),
+              ],
+            ),
+          ).animate().fadeIn(delay: 250.ms, duration: 350.ms),
+
+          const SizedBox(height: 24),
+
+          // ── Donasi ────────────────────────────────────────────────
+          _sectionTitle("Donasi", textColor),
+          _buildCard(
+            surface: surface,
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Container(
+                    width: 48,
+                    height: 48,
+                    margin: const EdgeInsets.only(bottom: 16),
+                    decoration: BoxDecoration(
+                      color: sageColor.withOpacity(0.15),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(Icons.volunteer_activism_rounded, color: sageColor),
+                  ),
+                  Text(
+                    "Dukung Operasional Kita",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: textColor,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    "Biar karya ini jalan terus tanpa iklan, yuk dukung operasional & kopi dev via Saweria! Terima kasih, Alhamdulillahijazakumullahukhoiro",
+                    style: TextStyle(
+                      color: textColor.withOpacity(0.7),
+                      fontSize: 13,
+                      height: 1.5,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () async {
+                      if (_settings.hapticEnabled) HapticFeedback.lightImpact();
+                      final url = Uri.parse('https://saweria.co/Kita462');
+                      if (!await launchUrl(url)) {
+                        debugPrint('Could not launch \$url');
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: sageColor,
+                      foregroundColor: bg,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      elevation: 0,
+                    ),
+                    child: const Text(
+                      "Donasi via Saweria",
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ).animate().fadeIn(delay: 280.ms, duration: 350.ms),
+
+          const SizedBox(height: 24),
+
+          // ── Aksi Akun ─────────────────────────────────────────────
+          if (user != null && !user!.isAnonymous) ...[
+            _buildCard(
+              surface: surface,
+              child: _buildTappableTile(
+                icon: Icons.logout_rounded,
+                iconColor: Colors.redAccent,
+                title: "Keluar",
+                subtitle: "Logout dari akun Google",
+                textColor: Colors.redAccent,
+                onTap: () => _showConfirmDialog(
+                  "Keluar?",
+                  "Kamu akan logout dari akun ini.",
+                  _logout,
+                  confirmColor: Colors.redAccent,
+                ),
+              ),
+            ).animate().fadeIn(delay: 300.ms, duration: 350.ms),
+            const SizedBox(height: 24),
+          ],
+
           const SizedBox(height: 40),
         ],
       ),
     );
   }
 
-  // WIDGET HELPER: Judul Kategori[cite: 2]
-  Widget _buildSectionTitle(String title) {
+  // ─── Helpers ────────────────────────────────────────────────────────────────
+
+  Widget _sectionTitle(String title, Color textColor) {
     return Padding(
-      padding: const EdgeInsets.only(left: 4, bottom: 12),
+      padding: const EdgeInsets.only(left: 4, bottom: 10),
       child: Text(
-        title.toUpperCase(), 
-        style: TextStyle(color: sageColor, fontWeight: FontWeight.bold, fontSize: 11, letterSpacing: 1.2),
+        title.toUpperCase(),
+        style: TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w700,
+          color: textColor.withOpacity(0.4),
+          letterSpacing: 1.2,
+        ),
       ),
     );
   }
 
-  // WIDGET HELPER: Baris Pengaturan[cite: 2]
-  Widget _buildSettingTile({
-    required IconData icon, 
-    required String title, 
-    required String subtitle, 
-    required VoidCallback onTap, 
-    Color? color,
-  }) {
+  Widget _buildCard({required Color surface, required Widget child}) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(color: surfaceColor, borderRadius: BorderRadius.circular(20)),
-      child: ListTile(
-        onTap: onTap,
-        leading: Icon(icon, color: color ?? Colors.white70),
-        title: Text(title, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: color)),
-        subtitle: Text(subtitle, style: const TextStyle(fontSize: 11, color: Colors.white38)),
-        trailing: const Icon(Icons.chevron_right_rounded, color: Colors.white12),
+      decoration: BoxDecoration(
+          color: surface, borderRadius: BorderRadius.circular(24)),
+      child: child,
+    );
+  }
+
+  Widget _divider(Color textColor) => Divider(
+        color: textColor.withOpacity(0.07),
+        height: 1,
+        indent: 68,
+        endIndent: 16,
+      );
+
+  Widget _buildSwitchTile({
+    required IconData icon,
+    required Color iconColor,
+    required String title,
+    required String subtitle,
+    required bool value,
+    required Color textColor,
+    required ValueChanged<bool> onChanged,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: Row(
+        children: [
+          Container(
+            width: 38,
+            height: 38,
+            decoration: BoxDecoration(
+              color: iconColor.withOpacity(0.12),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(icon, color: iconColor, size: 20),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title,
+                    style: TextStyle(
+                        fontWeight: FontWeight.w500, color: textColor)),
+                Text(subtitle,
+                    style: TextStyle(
+                        color: textColor.withOpacity(0.4), fontSize: 12)),
+              ],
+            ),
+          ),
+          Switch.adaptive(
+            value: value,
+            onChanged: onChanged,
+            activeColor: sageColor,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTappableTile({
+    required IconData icon,
+    required Color iconColor,
+    required String title,
+    required String subtitle,
+    required Color textColor,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: () {
+        if (_settings.hapticEnabled) HapticFeedback.lightImpact();
+        onTap();
+      },
+      borderRadius: BorderRadius.circular(24),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        child: Row(
+          children: [
+            Container(
+              width: 38,
+              height: 38,
+              decoration: BoxDecoration(
+                color: iconColor.withOpacity(0.12),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(icon, color: iconColor, size: 20),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title,
+                      style: TextStyle(
+                          fontWeight: FontWeight.w500, color: textColor)),
+                  Text(subtitle,
+                      style: TextStyle(
+                          color: textColor.withOpacity(0.4), fontSize: 12)),
+                ],
+              ),
+            ),
+            Icon(Icons.arrow_forward_ios_rounded,
+                size: 14, color: textColor.withOpacity(0.2)),
+          ],
+        ),
       ),
     );
   }

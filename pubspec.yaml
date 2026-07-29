@@ -16,6 +16,12 @@ dependencies:
   firebase_auth: ^5.2.0
   google_sign_in: ^7.2.0
   cloud_firestore: ^5.4.0
+  shared_preferences: ^2.3.0
+  flutter_animate: ^4.5.0
+  video_player: ^2.10.1
+  lottie: ^3.1.2
+  google_fonts: ^8.1.0
+  home_widget: ^0.7.0
 
 dev_dependencies:
   flutter_test:
@@ -43,9 +49,11 @@ flutter:
     - assets/surah/
     - assets/list_surah.json
     - assets/images/
+    - assets/videos/
     - "assets/PR 13/pr13.json"
     - "assets/Sholat sunnah/Sholatsunnah.json"
     - "assets/kumpulan doa/kumpulan_doa.json"
+    - "assets/lottie_splash/"
 
   fonts:
       - family: LPMQ

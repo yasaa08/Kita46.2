@@ -1,123 +1,374 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'app_settings.dart';
+import 'main.dart';
 
-class DetailSholatPage extends StatelessWidget {
+class DetailSholatPage extends StatefulWidget {
   final Map<String, dynamic> sholatData;
+  final List<Map<String, dynamic>> sholatList;
+  final int currentIndex;
 
-  const DetailSholatPage({super.key, required this.sholatData});
+  const DetailSholatPage({
+    super.key,
+    required this.sholatData,
+    this.sholatList = const [],
+    this.currentIndex = 0,
+  });
 
   @override
-  Widget build(BuildContext context) {
-    // Palet Warna Khas Pixel
-    final sageColor = const Color(0xFFB2C8BA);
-    final surfaceColor = const Color(0xFF242822);
-    final bgColor = const Color(0xFF1A1C19);
+  State<DetailSholatPage> createState() => _DetailSholatPageState();
+}
 
-    // Ambil data dari JSON
-    final String title = sholatData['title'] ?? 'Detail';
-    final String arabic = sholatData['arabic'] ?? '';
-    final String latin = sholatData['latin'] ?? '';
-    final String keutamaan = sholatData['keutamaan'] ?? '';
-    final String riwayat = sholatData['riwayat_hadis'] ?? '';
-    final String notes = sholatData['notes'] ?? '';
+class _DetailSholatPageState extends State<DetailSholatPage>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _floatingBarController;
+  bool _floatingBarVisible = true;
+  double _lastScrollOffset = 0;
+  final ScrollController _scrollController = ScrollController();
 
-    return Scaffold(
-      backgroundColor: bgColor,
-      appBar: AppBar(
-        title: Text(title, style: const TextStyle(fontWeight: FontWeight.w400, fontSize: 18)),
-        backgroundColor: bgColor,
-        surfaceTintColor: Colors.transparent,
-        centerTitle: true,
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // --- SEKSI BACAAN ---
-            if (arabic.isNotEmpty)
-              Text(
-                arabic,
-                textAlign: TextAlign.right,
-                style: TextStyle(fontFamily: 'LPMQ', fontSize: 32, color: sageColor, height: 1.8),
-              ),
-            const SizedBox(height: 24),
-            if (latin.isNotEmpty)
-              Text(
-                latin,
-                style: const TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.w500),
-              ),
-            
-            const SizedBox(height: 32),
+  final sageColor = const Color(0xFFB2C8BA);
+  final surfaceColor = const Color(0xFF242822);
+  final bgColor = const Color(0xFF1A1C19);
 
-            // --- SEKSI KEUTAMAAN ---
-            if (keutamaan.isNotEmpty)
-              _buildInfoSection(
-                title: "Keutamaan",
-                content: keutamaan,
-                icon: Icons.star_border_rounded,
-                iconColor: const Color(0xFFEADFB4), // Pastel Yellow
-                surfaceColor: surfaceColor,
-              ),
+  @override
+  void initState() {
+    super.initState();
+    _floatingBarController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+      value: 1.0,
+    );
+    _scrollController.addListener(_onScroll);
+  }
 
-            // --- SEKSI RIWAYAT HADIS ---
-            if (riwayat.isNotEmpty)
-              _buildInfoSection(
-                title: "Riwayat Hadis",
-                content: riwayat,
-                icon: Icons.history_edu_rounded,
-                iconColor: const Color(0xFFD2E0FB), // Pastel Blue
-                surfaceColor: surfaceColor,
-              ),
+  @override
+  void dispose() {
+    _floatingBarController.dispose();
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    super.dispose();
+  }
 
-            // --- SEKSI NOTES ---
-            if (notes.isNotEmpty)
-              _buildInfoSection(
-                title: "Catatan Amalan",
-                content: notes,
-                icon: Icons.edit_note_rounded,
-                iconColor: sageColor,
-                surfaceColor: surfaceColor,
-              ),
-            
-            const SizedBox(height: 20),
-          ],
+  void _onScroll() {
+    final offset = _scrollController.offset;
+    final delta = offset - _lastScrollOffset;
+    _lastScrollOffset = offset;
+    if (delta > 8 && _floatingBarVisible) {
+      setState(() => _floatingBarVisible = false);
+      _floatingBarController.reverse();
+    } else if (delta < -8 && !_floatingBarVisible) {
+      setState(() => _floatingBarVisible = true);
+      _floatingBarController.forward();
+    }
+  }
+
+  void _navigate(int index) {
+    if (index < 0 || index >= widget.sholatList.length) return;
+    if (AppSettings().hapticEnabled) HapticFeedback.lightImpact();
+    Navigator.pushReplacement(
+      context,
+      PageRouteBuilder(
+        pageBuilder: (_, __, ___) => DetailSholatPage(
+          sholatData: widget.sholatList[index],
+          sholatList: widget.sholatList,
+          currentIndex: index,
         ),
+        transitionDuration: const Duration(milliseconds: 400),
+        transitionsBuilder: (_, animation, __, child) {
+          return FadeTransition(
+            opacity: animation,
+            child: SlideTransition(
+              position: Tween<Offset>(
+                begin: const Offset(0.05, 0.0),
+                end: Offset.zero,
+              ).animate(CurvedAnimation(
+                  parent: animation, curve: Curves.easeOutCubic)),
+              child: child,
+            ),
+          );
+        },
       ),
     );
   }
 
-  // Widget helper untuk bikin kotak informasi
+  @override
+  Widget build(BuildContext context) {
+    final settings = AppSettings();
+    final bg = bgColor;
+    final surface = surfaceColor;
+    const textColor = Colors.white;
+
+    final String title = widget.sholatData['title'] ?? 'Detail';
+    final String arabic = widget.sholatData['arabic'] ?? '';
+    final String latin = widget.sholatData['latin'] ?? '';
+    final String keutamaan = widget.sholatData['keutamaan'] ?? '';
+    final String riwayat = widget.sholatData['riwayat_hadis'] ?? '';
+    final String notes = widget.sholatData['notes'] ?? '';
+
+    final hasPrev = widget.sholatList.isNotEmpty && widget.currentIndex > 0;
+    final hasNext = widget.sholatList.isNotEmpty &&
+        widget.currentIndex < widget.sholatList.length - 1;
+
+    return Scaffold(
+      backgroundColor: bg,
+      appBar: AppBar(
+        title: Text(title,
+            style: TextStyle(
+                fontWeight: FontWeight.w500, fontSize: 18, color: textColor)),
+        backgroundColor: bg,
+        surfaceTintColor: Colors.transparent,
+        centerTitle: true,
+      ),
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          SingleChildScrollView(
+            controller: _scrollController,
+            padding: const EdgeInsets.fromLTRB(24, 0, 24, 160),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (arabic.isNotEmpty) ...[
+                  Text(
+                    arabic,
+                    textAlign: TextAlign.right,
+                    style: TextStyle(
+                        fontFamily: 'LPMQ',
+                        fontSize: settings.arabicFontSize + 4,
+                        color: sageColor,
+                        height: 1.9),
+                  ).animate().fadeIn(duration: 400.ms),
+                  const SizedBox(height: 24),
+                ],
+                if (latin.isNotEmpty) ...[
+                  Text(latin,
+                          style: TextStyle(
+                              fontSize: 16,
+                              color: textColor,
+                              fontWeight: FontWeight.w500))
+                      .animate()
+                      .fadeIn(delay: 100.ms, duration: 400.ms),
+                  const SizedBox(height: 16),
+                ],
+                if (widget.sholatData['terjemahan'] != null && widget.sholatData['terjemahan'].toString().isNotEmpty) ...[
+                  Text(
+                    widget.sholatData['terjemahan'],
+                    style: TextStyle(
+                      fontSize: 15,
+                      color: textColor.withValues(alpha: 0.8),
+                    ),
+                  ).animate().fadeIn(delay: 150.ms, duration: 400.ms),
+                  const SizedBox(height: 32),
+                ] else if (latin.isNotEmpty) ...[
+                  const SizedBox(height: 16),
+                ],
+                if (keutamaan.isNotEmpty)
+                  _buildInfoSection(
+                    title: "Keutamaan",
+                    content: keutamaan,
+                    icon: Icons.star_border_rounded,
+                    iconColor: const Color(0xFFEADFB4),
+                    surface: surface,
+                    textColor: textColor,
+                    delay: 200,
+                  ),
+                if (riwayat.isNotEmpty)
+                  _buildInfoSection(
+                    title: "Riwayat Hadis",
+                    content: riwayat,
+                    icon: Icons.history_edu_rounded,
+                    iconColor: const Color(0xFFD2E0FB),
+                    surface: surface,
+                    textColor: textColor,
+                    delay: 300,
+                  ),
+                if (notes.isNotEmpty)
+                  _buildInfoSection(
+                    title: "Catatan Amalan",
+                    content: notes,
+                    icon: Icons.edit_note_rounded,
+                    iconColor: sageColor,
+                    surface: surface,
+                    textColor: textColor,
+                    delay: 400,
+                  ),
+              ],
+            ),
+          ),
+
+          // ── Floating Navigation Bar ──────────────────────────────
+          if (widget.sholatList.isNotEmpty)
+            Positioned(
+              bottom: 20,
+              left: 20,
+              right: 20,
+              child: AnimatedBuilder(
+                animation: _floatingBarController,
+                builder: (_, child) {
+                final springVal = Curves.elasticOut.transform(_floatingBarController.value);
+                final clamped = springVal.clamp(0.0, 1.2);
+                return Transform.translate(
+                  offset: Offset(0, 100 * (1 - clamped)),
+                  child: Opacity(
+                    opacity: _floatingBarController.value.clamp(0.0, 1.0),
+                    child: Transform.scale(
+                      scale: 0.8 + (0.2 * clamped),
+                      child: child,
+                    ),
+                  ),
+                );
+              },
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF2A2D27).withOpacity(0.97),
+                    borderRadius: BorderRadius.circular(100),
+                    boxShadow: [
+                      BoxShadow(
+                          color: Colors.black.withOpacity(0.2),
+                          blurRadius: 20,
+                          offset: const Offset(0, 4))
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      // Prev
+                      if (hasPrev)
+                        _NavBtn(
+                          icon: Icons.arrow_back_ios_rounded,
+                          onTap: () => _navigate(widget.currentIndex - 1),
+                          sageColor: sageColor,
+                        )
+                      else
+                        const SizedBox(width: 56),
+
+                      // Center
+                      Expanded(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              title,
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 12,
+                                  color: Colors.white),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              textAlign: TextAlign.center,
+                            ),
+                            Text(
+                              '${widget.currentIndex + 1} / ${widget.sholatList.length}',
+                              style: TextStyle(
+                                  fontSize: 10,
+                                  color: Colors.white38),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      // Next
+                      if (hasNext)
+                        _NavBtn(
+                          icon: Icons.arrow_forward_ios_rounded,
+                          onTap: () => _navigate(widget.currentIndex + 1),
+                          sageColor: sageColor,
+                        )
+                      else
+                        const SizedBox(width: 56),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildInfoSection({
     required String title,
     required String content,
     required IconData icon,
     required Color iconColor,
-    required Color surfaceColor,
+    required Color surface,
+    required Color textColor,
+    int delay = 0,
   }) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
+      margin: const EdgeInsets.only(bottom: 14),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: surfaceColor,
-        borderRadius: BorderRadius.circular(24), // Melengkung empuk
-        border: Border.all(color: Colors.white.withValues(alpha: 0.05)), // Garis tipis banget
+        color: surface,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: Colors.white.withOpacity(0.05)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Icon(icon, color: iconColor, size: 20),
-              const SizedBox(width: 8),
-              Text(title, style: TextStyle(fontWeight: FontWeight.bold, color: iconColor, fontSize: 14)),
-            ],
-          ),
+          Row(children: [
+            Icon(icon, color: iconColor, size: 18),
+            const SizedBox(width: 8),
+            Text(title,
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: iconColor,
+                    fontSize: 13)),
+          ]),
           const SizedBox(height: 12),
-          Text(
-            content,
-            style: const TextStyle(color: Colors.white70, fontSize: 14, height: 1.6),
-          ),
+          Text(content,
+              style: TextStyle(
+                  color: textColor.withOpacity(0.7),
+                  fontSize: 14,
+                  height: 1.6)),
         ],
+      ),
+    )
+        .animate(delay: Duration(milliseconds: delay))
+        .fadeIn(duration: 350.ms)
+        .slideY(begin: 0.05);
+  }
+}
+
+// ─── Nav Button ───────────────────────────────────────────────────────────────
+class _NavBtn extends StatefulWidget {
+  final IconData icon;
+  final VoidCallback onTap;
+  final Color sageColor;
+
+  const _NavBtn(
+      {required this.icon, required this.onTap, required this.sageColor});
+
+  @override
+  State<_NavBtn> createState() => _NavBtnState();
+}
+
+class _NavBtnState extends State<_NavBtn> {
+  bool _pressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTapDown: (_) => setState(() => _pressed = true),
+      onTapUp: (_) {
+        setState(() => _pressed = false);
+        widget.onTap();
+      },
+      onTapCancel: () => setState(() => _pressed = false),
+      child: AnimatedScale(
+        scale: _pressed ? 0.9 : 1.0,
+        duration: const Duration(milliseconds: 120),
+        child: Container(
+          width: 56,
+          height: 56,
+          decoration: BoxDecoration(
+            color: widget.sageColor.withOpacity(0.15),
+            borderRadius: BorderRadius.circular(100),
+          ),
+          child: Icon(widget.icon, color: widget.sageColor, size: 18),
+        ),
       ),
     );
   }
