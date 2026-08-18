@@ -357,7 +357,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   icon: Icons.info_outline_rounded,
                   iconColor: sageColor,
                   title: "Tentang Aplikasi",
-                  subtitle: "Versi 1.1.0",
+                  subtitle: "Versi 1.0.1",
                   textColor: textColor,
                   onTap: _showAboutApp,
                 ),
@@ -376,7 +376,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   icon: Icons.share_rounded,
                   iconColor: const Color(0xFFD2E0FB),
                   title: "Bagikan Aplikasi",
-                  subtitle: "Ajak temanmu belajar",
+                  subtitle: "Ajak temanmu",
                   textColor: textColor,
                   onTap: () =>
                       showTopNotification(context, "Membuka menu berbagi..."),

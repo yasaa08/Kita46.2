@@ -9,7 +9,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:343296288430:android:5402af121654556c576f3f",
         "android_client_info": {
-          "package_name": "com.example.kita_46_2"
+          "package_name": "com.kita462.quran"
         }
       },
       "oauth_client": [
@@ -17,7 +17,7 @@
           "client_id": "343296288430-8serl9qh2l0s1agfs7u10dgn7flmfmvh.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.example.kita_46_2",
+            "package_name": "com.kita462.quran",
             "certificate_hash": "167a24cc4b928992996a1a159b07931f92675e78"
           }
         },
