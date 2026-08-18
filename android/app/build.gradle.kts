@@ -6,29 +6,11 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
-// Reading signing properties from key.properties
-val keyPropertiesFile = rootProject.file("key.properties")
-var ksStorePassword: String? = null
-var ksKeyPassword: String? = null
-var ksKeyAlias: String? = null
-var ksStoreFilePath: String? = null
-
-if (keyPropertiesFile.exists()) {
-    val lines = keyPropertiesFile.readLines()
-    for (line in lines) {
-        val trimmed = line.trim()
-        if (trimmed.isEmpty() || trimmed.startsWith("#")) continue
-        val parts = trimmed.split("=", limit = 2)
-        if (parts.size == 2) {
-            when (parts[0].trim()) {
-                "storePassword" -> ksStorePassword = parts[1].trim()
-                "keyPassword" -> ksKeyPassword = parts[1].trim()
-                "keyAlias" -> ksKeyAlias = parts[1].trim()
-                "storeFile" -> ksStoreFilePath = parts[1].trim()
-            }
-        }
-    }
-}
+// Signing configuration - menggunakan keystore yang sudah di-generate
+val keystorePath = file("${rootProject.projectDir}/app/release.keystore")
+val ksStorePassword = "kita462barokah"
+val ksKeyPassword = "kita462barokah"
+val ksKeyAlias = "kita462"
 
 android {
     namespace = "com.example.kita_46_2"
@@ -56,14 +38,7 @@ android {
 
     signingConfigs {
         create("release") {
-            if (ksStoreFilePath != null) {
-                val resolvedPath: String = if (ksStoreFilePath!!.startsWith("/")) {
-                    ksStoreFilePath!!
-                } else {
-                    rootProject.file(ksStoreFilePath!!).absolutePath
-                }
-                storeFile = file(resolvedPath)
-            }
+            storeFile = keystorePath
             storePassword = ksStorePassword
             keyPassword = ksKeyPassword
             keyAlias = ksKeyAlias
