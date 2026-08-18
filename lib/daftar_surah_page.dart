@@ -2,6 +2,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'dart:async';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'app_settings.dart';
 import 'detail_surah_page.dart';
@@ -137,6 +138,7 @@ class _DaftarSurahPageState extends State<DaftarSurahPage> {
   List _filteredSurah = [];
   bool _isLoading = true;
   final TextEditingController _searchController = TextEditingController();
+  Timer? _debounce;
 
   final sageColor = const Color(0xFFB2C8BA);
   final surfaceColor = const Color(0xFF242822);
@@ -161,17 +163,22 @@ class _DaftarSurahPageState extends State<DaftarSurahPage> {
   }
 
   void _filterSurah(String query) {
-    setState(() {
-      if (query.isEmpty) {
-        _filteredSurah = _allSurah;
-      } else {
-        _filteredSurah = _allSurah.where((surah) {
-          final nameLower = surah['name'].toString().toLowerCase();
-          final searchLower = query.toLowerCase();
-          final number = surah['number'].toString();
-          return nameLower.contains(searchLower) ||
-              number.contains(searchLower);
-        }).toList();
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+    _debounce = Timer(const Duration(milliseconds: 300), () {
+      if (mounted) {
+        setState(() {
+          if (query.isEmpty) {
+            _filteredSurah = _allSurah;
+          } else {
+            _filteredSurah = _allSurah.where((surah) {
+              final nameLower = surah['name'].toString().toLowerCase();
+              final searchLower = query.toLowerCase();
+              final number = surah['number'].toString();
+              return nameLower.contains(searchLower) ||
+                  number.contains(searchLower);
+            }).toList();
+          }
+        });
       }
     });
   }
@@ -186,6 +193,7 @@ class _DaftarSurahPageState extends State<DaftarSurahPage> {
   @override
   void dispose() {
     _searchController.dispose();
+    _debounce?.cancel();
     super.dispose();
   }
 
@@ -326,12 +334,7 @@ class _DaftarSurahPageState extends State<DaftarSurahPage> {
                                 )),
                               );
                             },
-                          )
-                              .animate(
-                                  delay: Duration(
-                                      milliseconds:
-                                          index * 20 > 400 ? 400 : index * 20))
-                              .fadeIn(duration: 250.ms);
+                          );
                         },
                         separatorBuilder: (context, index) => Divider(
                           color: textColor.withOpacity(0.05),

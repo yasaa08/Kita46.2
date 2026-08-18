@@ -161,8 +161,8 @@ class _KumpulanDoaPageState extends State<KumpulanDoaPage> {
                                     buildSlideRoute(DetailDoaPage(
                                       doaData: item,
                                       doaList:
-                                          _listDoa.cast<Map<String, dynamic>>(),
-                                      currentIndex: _listDoa.indexOf(item),
+                                          _filteredDoa.cast<Map<String, dynamic>>(),
+                                      currentIndex: index,
                                     )),
                                   );
                                 },

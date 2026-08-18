@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -20,7 +21,6 @@ class Pr13DetailPage extends StatefulWidget {
 class _Pr13DetailPageState extends State<Pr13DetailPage>
     with TickerProviderStateMixin {
   int _counter = 0;
-  double _buttonScale = 1.0;
   bool _isCompleted = false;
   bool _showCompletionAnim = false;
 
@@ -35,6 +35,9 @@ class _Pr13DetailPageState extends State<Pr13DetailPage>
 
   late AnimationController _checkAnimCtrl;
   late Animation<double> _checkAnim;
+
+  late AnimationController _counterPulseCtrl;
+  Timer? _saveTimer;
 
   final sageColor = const Color(0xFFB2C8BA);
   final surfaceColor = const Color(0xFF242822);
@@ -51,6 +54,11 @@ class _Pr13DetailPageState extends State<Pr13DetailPage>
       duration: const Duration(milliseconds: 600),
     );
     _checkAnim = CurvedAnimation(parent: _checkAnimCtrl, curve: Curves.elasticOut);
+
+    _counterPulseCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 150),
+    );
 
     WidgetsBinding.instance.addPostFrameCallback((_) => _initialize());
   }
@@ -217,6 +225,13 @@ class _Pr13DetailPageState extends State<Pr13DetailPage>
     }, SetOptions(merge: true));
   }
 
+  void _debouncedSave() {
+    _saveTimer?.cancel();
+    _saveTimer = Timer(const Duration(milliseconds: 1500), () {
+      _autoSaveCounter();
+    });
+  }
+
   void _incrementCounter() {
     if (_isCompleted) return;
     if (_counter >= _maxCount) return;
@@ -224,13 +239,10 @@ class _Pr13DetailPageState extends State<Pr13DetailPage>
     if (AppSettings().hapticEnabled) HapticFeedback.mediumImpact();
     setState(() {
       _counter++;
-      _buttonScale = 0.92;
     });
-    Future.delayed(const Duration(milliseconds: 100), () {
-      if (mounted) setState(() => _buttonScale = 1.0);
-    });
+    _counterPulseCtrl.forward(from: 0.0);
 
-    _autoSaveCounter();
+    _debouncedSave();
 
     if (_counter >= _maxCount && _maxCount < 999999) {
       _onReachMax();
@@ -238,13 +250,19 @@ class _Pr13DetailPageState extends State<Pr13DetailPage>
   }
 
   void _onReachMax() {
-    if (AppSettings().hapticEnabled) HapticFeedback.heavyImpact();
+    if (AppSettings().hapticEnabled) {
+      HapticFeedback.heavyImpact();
+      Future.delayed(const Duration(milliseconds: 200), () {
+        HapticFeedback.heavyImpact();
+      });
+    }
     setState(() {
       _isCompleted = true;
       _showCompletionAnim = true;
     });
     _checkAnimCtrl.forward(from: 0.0);
 
+    _saveTimer?.cancel();
     if (!_isPr9) {
       _saveCompletion();
     }
@@ -295,15 +313,31 @@ class _Pr13DetailPageState extends State<Pr13DetailPage>
     final user = FirebaseAuth.instance.currentUser;
     if (user == null || user.isAnonymous) return;
     try {
+      final title = widget.doaData['title'] ?? '';
+      final today = _todayStr();
       await FirebaseFirestore.instance
           .collection('users')
           .doc(user.uid)
           .collection('pr13_progress')
-          .doc(widget.doaData['title'] ?? '')
+          .doc(title)
           .set({
         'count': _counter,
         'lastUpdated': FieldValue.serverTimestamp(),
       }, SetOptions(merge: true));
+
+      if (!_isPr9) {
+        await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
+          'last_pr13_title': title,
+          'last_pr13_count': _counter,
+          'last_pr13_date': today,
+        }, SetOptions(merge: true));
+
+        WidgetService.updateWidget(
+          prTitle: title,
+          prCount: _counter.toString(),
+          prDate: today,
+        );
+      }
     } catch (_) {}
   }
 
@@ -316,6 +350,9 @@ class _Pr13DetailPageState extends State<Pr13DetailPage>
       _isCompleted = false;
       _showCompletionAnim = false;
     });
+    
+    _saveTimer?.cancel();
+    
     if (_isPr9) {
       _savePr9Session();
     } else {
@@ -326,6 +363,11 @@ class _Pr13DetailPageState extends State<Pr13DetailPage>
 
   @override
   void dispose() {
+    if (_saveTimer?.isActive ?? false) {
+      _saveTimer?.cancel();
+      _autoSaveCounter();
+    }
+    _counterPulseCtrl.dispose();
     _checkAnimCtrl.dispose();
     super.dispose();
   }
@@ -491,24 +533,20 @@ class _Pr13DetailPageState extends State<Pr13DetailPage>
                     style: TextStyle(color: Colors.white38, fontSize: 12),
                   ),
                 const SizedBox(height: 16),
-                AnimatedScale(
-                  scale: _buttonScale,
-                  duration: const Duration(milliseconds: 100),
-                  curve: Curves.easeOut,
-                  child: Material(
-                    color: _isCompleted
-                        ? sageColor
-                        : _maxCount < 999999 && _counter > 0
-                            ? sageColor.withOpacity(0.3)
-                            : sageColor,
-                    borderRadius: BorderRadius.circular(40),
-                    clipBehavior: Clip.antiAlias,
-                    child: InkWell(
-                      onTap: _isCompleted ? null : _incrementCounter,
-                      child: Container(
-                        width: double.infinity,
-                        height: 140,
-                        alignment: Alignment.center,
+                Material(
+                  color: _isCompleted
+                      ? sageColor
+                      : _maxCount < 999999 && _counter > 0
+                          ? sageColor.withOpacity(0.3)
+                          : sageColor,
+                  borderRadius: BorderRadius.circular(40),
+                  clipBehavior: Clip.antiAlias,
+                  child: InkWell(
+                    onTap: _isCompleted ? null : _incrementCounter,
+                    child: Container(
+                      width: double.infinity,
+                      height: 140,
+                      alignment: Alignment.center,
                         child: _showCompletionAnim && _isCompleted
                             ? ScaleTransition(
                                 scale: _checkAnim,
@@ -534,14 +572,22 @@ class _Pr13DetailPageState extends State<Pr13DetailPage>
                             : Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Text(
-                                    '$_counter',
-                                    style: TextStyle(
-                                      fontSize: 64,
-                                      fontWeight: FontWeight.bold,
-                                      color: _isCompleted
-                                          ? Colors.white
-                                          : bgColor,
+                                  ScaleTransition(
+                                    scale: Tween<double>(begin: 1.0, end: 1.08).animate(
+                                      CurvedAnimation(
+                                        parent: _counterPulseCtrl,
+                                        curve: Curves.easeOut,
+                                      ),
+                                    ),
+                                    child: Text(
+                                      '$_counter',
+                                      style: TextStyle(
+                                        fontSize: 64,
+                                        fontWeight: FontWeight.bold,
+                                        color: _isCompleted
+                                            ? Colors.white
+                                            : bgColor,
+                                      ),
                                     ),
                                   ),
                                   if (!_isPr9 || _pr9Session == 'malam')
@@ -558,9 +604,13 @@ class _Pr13DetailPageState extends State<Pr13DetailPage>
                                     ),
                                 ],
                               ),
-                      ),
                     ),
                   ),
+                ).animate(key: ValueKey(_counter)).scale(
+                  begin: const Offset(0.96, 0.96),
+                  end: const Offset(1.0, 1.0),
+                  duration: 150.ms,
+                  curve: Curves.easeOut,
                 ),
               ],
             ),

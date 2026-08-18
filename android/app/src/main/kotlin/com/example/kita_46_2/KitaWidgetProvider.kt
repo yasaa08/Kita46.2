@@ -1,8 +1,11 @@
 package com.example.kita_46_2
 
+import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
+import android.net.Uri
 import android.widget.RemoteViews
 import es.antonborri.home_widget.HomeWidgetProvider
 import java.text.SimpleDateFormat
@@ -46,6 +49,34 @@ class KitaWidgetProvider : HomeWidgetProvider() {
                 views.setTextViewText(R.id.widget_pr_text, "-")
                 views.setTextViewText(R.id.widget_pr_subtitle, "Belum dikerjakan")
             }
+
+            // Click handler for Qur'an area → opens app to last-read surah
+            val quranIntent = Intent(context, MainActivity::class.java).apply {
+                action = "es.antonborri.home_widget.action.LAUNCH"
+                data = Uri.parse("kita462://quran")
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            }
+            val quranPending = PendingIntent.getActivity(
+                context,
+                0,
+                quranIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+            views.setOnClickPendingIntent(R.id.widget_quran_area, quranPending)
+
+            // Click handler for PR 13 area → opens app to PR 13 page
+            val prIntent = Intent(context, MainActivity::class.java).apply {
+                action = "es.antonborri.home_widget.action.LAUNCH"
+                data = Uri.parse("kita462://pr13")
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            }
+            val prPending = PendingIntent.getActivity(
+                context,
+                1,
+                prIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+            views.setOnClickPendingIntent(R.id.widget_pr_area, prPending)
 
             appWidgetManager.updateAppWidget(appWidgetId, views)
         }

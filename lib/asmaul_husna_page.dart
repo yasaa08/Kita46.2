@@ -72,6 +72,9 @@ class _AsmaulHusnaPageState extends State<AsmaulHusnaPage> {
               itemCount: _asmaulHusna.length,
               itemBuilder: (context, index) {
                 final item = _asmaulHusna[index];
+                if (index >= 12) {
+                  return AsmaulHusnaCard(itemData: item, surface: surface);
+                }
                 return TweenAnimationBuilder(
                   duration:
                       Duration(milliseconds: 200 + (index % 12 * 60).toInt()),

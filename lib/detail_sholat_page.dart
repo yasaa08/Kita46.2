@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'app_settings.dart';
-import 'main.dart';
 
 class DetailSholatPage extends StatefulWidget {
   final Map<String, dynamic> sholatData;
@@ -23,7 +22,7 @@ class DetailSholatPage extends StatefulWidget {
 class _DetailSholatPageState extends State<DetailSholatPage>
     with SingleTickerProviderStateMixin {
   late AnimationController _floatingBarController;
-  bool _floatingBarVisible = true;
+  final ValueNotifier<bool> _floatingBarVisible = ValueNotifier(true);
   double _lastScrollOffset = 0;
   final ScrollController _scrollController = ScrollController();
 
@@ -44,6 +43,7 @@ class _DetailSholatPageState extends State<DetailSholatPage>
 
   @override
   void dispose() {
+    _floatingBarVisible.dispose();
     _floatingBarController.dispose();
     _scrollController.removeListener(_onScroll);
     _scrollController.dispose();
@@ -54,11 +54,11 @@ class _DetailSholatPageState extends State<DetailSholatPage>
     final offset = _scrollController.offset;
     final delta = offset - _lastScrollOffset;
     _lastScrollOffset = offset;
-    if (delta > 8 && _floatingBarVisible) {
-      setState(() => _floatingBarVisible = false);
+    if (delta > 8 && _floatingBarVisible.value) {
+      _floatingBarVisible.value = false;
       _floatingBarController.reverse();
-    } else if (delta < -8 && !_floatingBarVisible) {
-      setState(() => _floatingBarVisible = true);
+    } else if (delta < -8 && !_floatingBarVisible.value) {
+      _floatingBarVisible.value = true;
       _floatingBarController.forward();
     }
   }
@@ -203,8 +203,11 @@ class _DetailSholatPageState extends State<DetailSholatPage>
               bottom: 20,
               left: 20,
               right: 20,
-              child: AnimatedBuilder(
-                animation: _floatingBarController,
+              child: ValueListenableBuilder<bool>(
+                valueListenable: _floatingBarVisible,
+                builder: (context, isVisible, child) {
+                  return AnimatedBuilder(
+                    animation: _floatingBarController,
                 builder: (_, child) {
                 final springVal = Curves.elasticOut.transform(_floatingBarController.value);
                 final clamped = springVal.clamp(0.0, 1.2);
@@ -281,9 +284,11 @@ class _DetailSholatPageState extends State<DetailSholatPage>
                     ],
                   ),
                 ),
-              ),
-            ),
-        ],
+              );
+            },
+          ),
+        ),
+      ],
       ),
     );
   }

@@ -7,6 +7,7 @@
     android:background="#1A1C19">
 
     <LinearLayout
+        android:id="@+id/widget_quran_area"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"
@@ -63,6 +64,7 @@
         android:background="#2A2D27" />
 
     <LinearLayout
+        android:id="@+id/widget_pr_area"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"

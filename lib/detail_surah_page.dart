@@ -67,6 +67,9 @@ class _DetailSurahPageState extends State<DetailSurahPage>
   bool _isLoading = true;
   int _selectedAyah = 0; // Ayah yang dipilih user sebelum di-save
 
+  Map<String, dynamic>? _cachedPrevSurah;
+  Map<String, dynamic>? _cachedNextSurah;
+
   final sageColor = const Color(0xFFB2C8BA);
   final surface = const Color(0xFF242822);
   final bg = const Color(0xFF1A1C19);
@@ -213,8 +216,27 @@ class _DetailSurahPageState extends State<DetailSurahPage>
   Future<void> _loadAllSurah() async {
     try {
       final res = await rootBundle.loadString('assets/list_surah.json');
-      if (mounted) setState(() => _allSurah = json.decode(res));
+      if (mounted) {
+        setState(() {
+          _allSurah = json.decode(res);
+          _computeCachedSurah();
+        });
+      }
     } catch (_) {}
+  }
+
+  void _computeCachedSurah() {
+    if (_allSurah.isEmpty) return;
+    if (widget.surahNumber > 1) {
+      _cachedPrevSurah = _allSurah.cast<Map<String, dynamic>>().firstWhere(
+          (s) => s['number'] == widget.surahNumber - 1,
+          orElse: () => <String, dynamic>{});
+    }
+    if (widget.surahNumber < 114) {
+      _cachedNextSurah = _allSurah.cast<Map<String, dynamic>>().firstWhere(
+          (s) => s['number'] == widget.surahNumber + 1,
+          orElse: () => <String, dynamic>{});
+    }
   }
 
   Future<void> readJson() async {
@@ -255,6 +277,7 @@ class _DetailSurahPageState extends State<DetailSurahPage>
         }, SetOptions(merge: true));
         WidgetService.updateWidget(
           surahName: widget.surahName,
+          surahNumber: widget.surahNumber.toString(),
           ayahNumber: ayahNumber.toString(),
         );
         return true;
@@ -265,19 +288,9 @@ class _DetailSurahPageState extends State<DetailSurahPage>
     return false;
   }
 
-  Map<String, dynamic>? get _prevSurah {
-    if (_allSurah.isEmpty || widget.surahNumber <= 1) return null;
-    return _allSurah.cast<Map<String, dynamic>>().firstWhere(
-        (s) => s['number'] == widget.surahNumber - 1,
-        orElse: () => {});
-  }
+  Map<String, dynamic>? get _prevSurah => _cachedPrevSurah;
 
-  Map<String, dynamic>? get _nextSurah {
-    if (_allSurah.isEmpty || widget.surahNumber >= 114) return null;
-    return _allSurah.cast<Map<String, dynamic>>().firstWhere(
-        (s) => s['number'] == widget.surahNumber + 1,
-        orElse: () => {});
-  }
+  Map<String, dynamic>? get _nextSurah => _cachedNextSurah;
 
   void _goToSurah(Map<String, dynamic> surah, {bool isNext = true}) {
     if (AppSettings().hapticEnabled) HapticFeedback.lightImpact();
