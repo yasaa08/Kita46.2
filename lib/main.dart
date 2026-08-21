@@ -14,6 +14,7 @@ import 'widget_service.dart';
 import 'settings_page.dart';
 import 'splash_screen.dart';
 import 'app_settings.dart';
+import 'streak_service.dart';
 
 // Import Halaman Menu
 import 'daftar_surah_page.dart';
@@ -27,6 +28,7 @@ import 'detail_surah_page.dart';
 import 'detail_sholat_page.dart';
 import 'detail_doa_page.dart';
 import 'pr13_detail_page.dart';
+import 'search_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -223,6 +225,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     _settings.addListener(_onSettingsChange);
     _quickAccess.addListener(_onQuickAccessChange);
     _quickAccess.loadItems();
+    StreakService().loadStreak();
     _settingsController = AnimationController(
       duration: const Duration(milliseconds: 500),
       vsync: this,
@@ -468,14 +471,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         title: GestureDetector(
           onTap: () {
             if (_settings.hapticEnabled) HapticFeedback.lightImpact();
-            showSearch(
-              context: context,
-              delegate: _AppSearchDelegate(
-                searchData: _searchData,
-                sageColor: sageColor,
-                bgColor: surfaceColor,
-                context: context,
-              ),
+            Navigator.push(
+              context,
+              buildSlideRoute(SearchPage(searchData: _searchData)),
             );
           },
           child: Container(
@@ -548,7 +546,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     stream: DatabaseService().userHistory,
                     builder: (context, snapshot) {
                       final user = FirebaseAuth.instance.currentUser;
-                      if (user == null) {
+                      if (user == null || user.isAnonymous) {
                         return _buildGuestHistory(sageColor, surfaceColor, textColor);
                       }
                       if (!snapshot.hasData || !snapshot.data!.exists) {
@@ -775,6 +773,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   // ─── Quick Access Section ──────────────────────────────────────────────────
 
   Widget _buildQuickAccessSection(Color sage, Color surface, Color textColor) {
+    final user = FirebaseAuth.instance.currentUser;
+    final isGuest = user == null || user.isAnonymous;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -791,7 +792,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 letterSpacing: 1.0,
               ),
             ),
-            if (_quickAccess.items.isNotEmpty)
+            if (!isGuest && _quickAccess.items.isNotEmpty)
               GestureDetector(
                 onTap: () {
                   if (_settings.hapticEnabled) HapticFeedback.lightImpact();
@@ -810,12 +811,70 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         ),
         const SizedBox(height: 12),
 
-        // Content — empty or populated
-        _quickAccess.isEmpty
-            ? _buildQuickAccessEmptyCard(sage, surface, textColor)
-            : _buildQuickAccessList(sage, surface, textColor),
+        // Content — guest, empty, or populated
+        isGuest
+            ? _buildQuickAccessGuestCard(sage, surface, textColor)
+            : _quickAccess.isEmpty
+                ? _buildQuickAccessEmptyCard(sage, surface, textColor)
+                : _buildQuickAccessList(sage, surface, textColor),
       ],
     ).animate(delay: 700.ms).fadeIn(duration: 400.ms).slideY(begin: 0.05);
+  }
+
+  Widget _buildQuickAccessGuestCard(Color sage, Color surface, Color textColor) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      decoration: BoxDecoration(
+        color: surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: sage.withOpacity(0.12),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: sage.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(
+              Icons.lock_outline_rounded,
+              color: sage.withOpacity(0.6),
+              size: 18,
+            ),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Login untuk Quick Access",
+                  style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 13,
+                    color: textColor,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  "Simpan akses cepat ke surat favoritmu",
+                  style: TextStyle(
+                    color: textColor.withOpacity(0.4),
+                    fontSize: 11,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _buildQuickAccessEmptyCard(Color sage, Color surface, Color textColor) {
@@ -1076,30 +1135,59 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   Widget _buildGuestHistory(Color sage, Color surface, Color textColor) {
     return Container(
-        padding: const EdgeInsets.all(24),
-        decoration: BoxDecoration(
-            color: surface, borderRadius: BorderRadius.circular(28)),
-        child: Row(children: [
-          Icon(Icons.account_circle_outlined, color: sage),
-          const SizedBox(width: 12),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text("Mode Tamu",
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, color: textColor)),
-              Text("Login untuk simpan riwayat",
-                  style: TextStyle(
-                      color: textColor.withOpacity(0.4), fontSize: 12)),
-            ],
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      decoration: BoxDecoration(
+        color: surface,
+        borderRadius: BorderRadius.circular(28),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: sage.withOpacity(0.12),
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Icon(Icons.account_circle_outlined, color: sage, size: 24),
           ),
-          const Spacer(),
-          TextButton(
-            onPressed: () =>
-                Navigator.push(context, buildSlideRoute(const LoginPage())),
-            child: Text("Login", style: TextStyle(color: sage, fontSize: 13)),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text("Mode Tamu",
+                    style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                        color: textColor)),
+                const SizedBox(height: 2),
+                Text("Login untuk melihat riwayat",
+                    style: TextStyle(
+                        color: textColor.withOpacity(0.4), fontSize: 12)),
+              ],
+            ),
           ),
-        ]));
+          const SizedBox(width: 10),
+          FilledButton.tonal(
+            onPressed: () {
+              if (_settings.hapticEnabled) HapticFeedback.lightImpact();
+              Navigator.push(context, buildSlideRoute(const LoginPage()));
+            },
+            style: FilledButton.styleFrom(
+              backgroundColor: sage.withOpacity(0.15),
+              foregroundColor: sage,
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            child: const Text("Login",
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+          ),
+        ],
+      ),
+    );
   }
 
   // Dialog Saran untuk user yang sudah login
@@ -1749,158 +1837,3 @@ class _AddQuickAccessSheetState extends State<_AddQuickAccessSheet> {
   }
 }
 
-// ─── Custom Search Delegate ───────────────────────────────────────────────────
-class _AppSearchDelegate extends SearchDelegate<String> {
-  final List<Map<String, dynamic>> searchData;
-  final Color sageColor;
-  final Color bgColor;
-  final BuildContext context;
-
-  _AppSearchDelegate({
-    required this.searchData,
-    required this.sageColor,
-    required this.bgColor,
-    required this.context,
-  });
-
-  @override
-  ThemeData appBarTheme(BuildContext context) {
-    return Theme.of(context).copyWith(
-      scaffoldBackgroundColor: const Color(0xFF1A1C19),
-      appBarTheme: const AppBarTheme(
-        backgroundColor: Color(0xFF1A1C19),
-        elevation: 0,
-        iconTheme: IconThemeData(color: Colors.white70),
-        titleTextStyle: TextStyle(
-          color: Colors.white,
-          fontSize: 16,
-        ),
-      ),
-      inputDecorationTheme: const InputDecorationTheme(
-        hintStyle: TextStyle(color: Colors.white38),
-        border: InputBorder.none,
-      ),
-    );
-  }
-
-  @override
-  String get searchFieldLabel => 'Cari surah, doa, sholat...';
-
-  @override
-  List<Widget> buildActions(BuildContext context) => [
-        if (query.isNotEmpty)
-          IconButton(
-            icon: const Icon(Icons.clear_rounded),
-            onPressed: () => query = '',
-          ),
-      ];
-
-  @override
-  Widget buildLeading(BuildContext context) => IconButton(
-        icon: const Icon(Icons.arrow_back_rounded),
-        onPressed: () => close(context, ''),
-      );
-
-  @override
-  Widget buildResults(BuildContext context) => _buildList(context);
-
-  @override
-  Widget buildSuggestions(BuildContext context) => _buildList(context);
-
-  Widget _buildList(BuildContext context) {
-    const surfaceColor = Color(0xFF242822);
-    const textColor = Colors.white;
-
-    if (query.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.search_rounded,
-                size: 64, color: textColor.withOpacity(0.2)),
-            const SizedBox(height: 16),
-            Text("Ketik untuk mencari...",
-                style: TextStyle(color: textColor.withOpacity(0.4))),
-          ],
-        ),
-      );
-    }
-
-    final results = searchData
-        .where((item) =>
-            item['title'].toString().toLowerCase().contains(query.toLowerCase()))
-        .toList();
-
-    if (results.isEmpty) {
-      return Center(
-        child: Text("Tidak ditemukan untuk \"$query\"",
-            style: TextStyle(color: textColor.withOpacity(0.4))),
-      );
-    }
-
-    return ListView.builder(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      itemCount: results.length,
-      itemBuilder: (ctx, i) {
-        final item = results[i];
-        return Container(
-          margin: const EdgeInsets.only(bottom: 8),
-          decoration: BoxDecoration(
-            color: surfaceColor,
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: ListTile(
-            leading: Container(
-              width: 42,
-              height: 42,
-              decoration: BoxDecoration(
-                color: sageColor.withOpacity(0.15),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(item['icon'], color: sageColor, size: 20),
-            ),
-            title: Text(item['title'],
-                style: TextStyle(
-                    color: textColor, fontWeight: FontWeight.w500)),
-            subtitle: Text(item['type'],
-                style: TextStyle(
-                    color: textColor.withOpacity(0.4), fontSize: 12)),
-            trailing: Icon(Icons.arrow_forward_ios_rounded,
-                size: 14, color: textColor.withOpacity(0.2)),
-            onTap: () {
-              HapticFeedback.lightImpact();
-              close(context, item['title']);
-              _navigate(context, item);
-            },
-          ),
-        )
-            .animate(delay: Duration(milliseconds: i * 40))
-            .fadeIn(duration: 250.ms)
-            .slideX(begin: 0.05);
-      },
-    );
-  }
-
-  void _navigate(BuildContext context, Map<String, dynamic> item) {
-    if (item['type'] == 'Menu') {
-      Navigator.push(context, buildSlideRoute(item['page']));
-    } else if (item['type'] == 'Surah') {
-      Navigator.push(
-          context,
-          buildSlideRoute(DetailSurahPage(
-              surahNumber:
-                  int.parse(item['data']['number'].toString()),
-              surahName: item['data']['name_latin'] ?? item['data']['name'],
-              revelation: item['data']['revelation'] ?? '')));
-    } else if (item['type'] == 'Sholat') {
-      Navigator.push(context,
-          buildSlideRoute(DetailSholatPage(sholatData: item['data'])));
-    } else if (item['type'] == 'PR 13') {
-      Navigator.push(context,
-          buildSlideRoute(Pr13DetailPage(doaData: item['data'])));
-    } else if (item['type'] == 'Doa') {
-      Navigator.push(context,
-          buildSlideRoute(DetailDoaPage(doaData: item['data'])));
-    }
-  }
-}

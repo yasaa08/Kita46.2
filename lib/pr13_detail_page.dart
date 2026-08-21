@@ -7,6 +7,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'app_settings.dart';
 import 'main.dart';
 import 'widget_service.dart';
+import 'streak_service.dart';
 
 class Pr13DetailPage extends StatefulWidget {
   final Map<String, dynamic> doaData;
@@ -23,8 +24,6 @@ class _Pr13DetailPageState extends State<Pr13DetailPage>
   int _counter = 0;
   bool _isCompleted = false;
   bool _showCompletionAnim = false;
-
-  bool _isBookmarked = false;
 
   String _pr9Session = 'pagi';
   late int _maxCount;
@@ -67,7 +66,6 @@ class _Pr13DetailPageState extends State<Pr13DetailPage>
     if (_isPr9) _determineSession();
     await _checkDailyReset();
     if (_isPr9) await _checkPr9SessionReset();
-    if (_isPr13) await _loadBookmarkState();
   }
 
   String _todayStr() {
@@ -188,43 +186,6 @@ class _Pr13DetailPageState extends State<Pr13DetailPage>
     }, SetOptions(merge: true));
   }
 
-  Future<void> _loadBookmarkState() async {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user == null || user.isAnonymous) {
-      if (mounted) setState(() {});
-      return;
-    }
-    try {
-      final doc = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid)
-          .collection('pr13_progress')
-          .doc(widget.doaData['title'] ?? '')
-          .get();
-      if (doc.exists) {
-        _isBookmarked = doc.data()?['bookmarked'] == true;
-      }
-    } catch (_) {}
-    if (mounted) setState(() {});
-  }
-
-  Future<void> _toggleBookmark() async {
-    if (AppSettings().hapticEnabled) HapticFeedback.lightImpact();
-    setState(() => _isBookmarked = !_isBookmarked);
-
-    final user = FirebaseAuth.instance.currentUser;
-    if (user == null || user.isAnonymous) return;
-    await FirebaseFirestore.instance
-        .collection('users')
-        .doc(user.uid)
-        .collection('pr13_progress')
-        .doc(widget.doaData['title'] ?? '')
-        .set({
-      'bookmarked': _isBookmarked,
-      'lastUpdated': FieldValue.serverTimestamp(),
-    }, SetOptions(merge: true));
-  }
-
   void _debouncedSave() {
     _saveTimer?.cancel();
     _saveTimer = Timer(const Duration(milliseconds: 1500), () {
@@ -266,6 +227,7 @@ class _Pr13DetailPageState extends State<Pr13DetailPage>
     if (!_isPr9) {
       _saveCompletion();
     }
+    StreakService().recordActivity('pr13');
 
     showTopNotification(
       context,
@@ -363,10 +325,8 @@ class _Pr13DetailPageState extends State<Pr13DetailPage>
 
   @override
   void dispose() {
-    if (_saveTimer?.isActive ?? false) {
-      _saveTimer?.cancel();
-      _autoSaveCounter();
-    }
+    _saveTimer?.cancel();
+    _autoSaveCounter();
     _counterPulseCtrl.dispose();
     _checkAnimCtrl.dispose();
     super.dispose();
@@ -385,48 +345,35 @@ class _Pr13DetailPageState extends State<Pr13DetailPage>
     final String translation = widget.doaData['translation'] ?? '';
     final String notes = widget.doaData['notes'] ?? '';
 
-    return Scaffold(
-      backgroundColor: bg,
-      appBar: AppBar(
-        title: Text(title,
-            style: const TextStyle(
-                fontWeight: FontWeight.w500, fontSize: 18, color: Colors.white)),
+    return PopScope(
+      canPop: true,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) {
+          _saveTimer?.cancel();
+          _autoSaveCounter();
+        }
+      },
+      child: Scaffold(
         backgroundColor: bg,
-        surfaceTintColor: Colors.transparent,
-        centerTitle: true,
-        actions: [
-          IconButton(
-            icon: Icon(Icons.refresh_rounded, color: textColor.withOpacity(0.5)),
-            tooltip: 'Reset',
-            onPressed: () {
-              if (settings.hapticEnabled) HapticFeedback.lightImpact();
-              _resetCounter();
-            },
-          ),
-          if (_isPr13)
+        appBar: AppBar(
+          title: Text(title,
+              style: const TextStyle(
+                  fontWeight: FontWeight.w500, fontSize: 18, color: Colors.white)),
+          backgroundColor: bg,
+          surfaceTintColor: Colors.transparent,
+          centerTitle: true,
+          actions: [
             IconButton(
-              icon: Icon(
-                _isBookmarked
-                    ? Icons.bookmark_rounded
-                    : Icons.bookmark_border_rounded,
-                color: _isBookmarked ? Colors.white : sageColor,
-              ),
-              tooltip: _isBookmarked ? 'Tandai sudah dibaca' : 'Tandai sudah dibaca',
-              onPressed: _toggleBookmark,
-            )
-          else
-            IconButton(
-              icon: Icon(Icons.bookmark_border_rounded, color: sageColor),
-              tooltip: 'Simpan',
+              icon: Icon(Icons.refresh_rounded, color: textColor.withOpacity(0.5)),
+              tooltip: 'Reset',
               onPressed: () {
                 if (settings.hapticEnabled) HapticFeedback.lightImpact();
-                _saveCompletion();
-                showTopNotification(context, 'Tersimpan!');
+                _resetCounter();
               },
             ),
-          const SizedBox(width: 8),
-        ],
-      ),
+            const SizedBox(width: 8),
+          ],
+        ),
       body: Column(
         children: [
           Expanded(
@@ -439,8 +386,7 @@ class _Pr13DetailPageState extends State<Pr13DetailPage>
                     Text(
                       arabic,
                       textAlign: TextAlign.right,
-                      style: TextStyle(
-                          fontFamily: 'LPMQ',
+                      style: settings.getArabicStyle(
                           fontSize: settings.arabicFontSize + 4,
                           color: sageColor,
                           height: 1.9),
@@ -617,6 +563,7 @@ class _Pr13DetailPageState extends State<Pr13DetailPage>
           ),
         ],
       ),
-    );
-  }
+    ),
+  );
+}
 }

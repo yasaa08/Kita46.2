@@ -62,7 +62,7 @@ class _SholatSunnahPageState extends State<SholatSunnahPage> {
       body: _isLoading
           ? Center(child: CircularProgressIndicator(color: sageColor))
           : ListView.builder(
-              padding: const EdgeInsets.fromLTRB(20, 16, 20, 120),
+              padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
               itemCount: _listSholat.length,
               itemBuilder: (context, index) {
                 final item = _listSholat[index];

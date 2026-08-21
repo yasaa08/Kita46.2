@@ -134,7 +134,7 @@ class _Pr13PageState extends State<Pr13Page> {
                 await _loadCompletedStatus();
               },
               child: ListView.builder(
-                padding: const EdgeInsets.fromLTRB(20, 16, 20, 120),
+                padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
                 itemCount: _pr13List.length,
                 itemBuilder: (context, index) {
                   final doa = _pr13List[index];

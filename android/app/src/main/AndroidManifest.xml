@@ -1,6 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- Internet permission is required for Firebase and other network calls -->
     <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- Vibrate permission for haptic feedback on dzikir counter, etc. -->
+    <uses-permission android:name="android.permission.VIBRATE"/>
     <application
         android:label="kita 46.2"
         android:name="${applicationName}"

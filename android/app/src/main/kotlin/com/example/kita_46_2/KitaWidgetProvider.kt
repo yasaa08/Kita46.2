@@ -31,6 +31,8 @@ class KitaWidgetProvider : HomeWidgetProvider() {
         val hasQuran = surahText != null && surahText.isNotEmpty()
         val hasPr = prTitle != null && prTitle.isNotEmpty() && prIsToday
 
+        val streakMsg = widgetData.getString("widget_streak_message", null)
+
         for (appWidgetId in appWidgetIds) {
             val views = RemoteViews(context.packageName, R.layout.kita_widget_layout)
 
@@ -39,7 +41,7 @@ class KitaWidgetProvider : HomeWidgetProvider() {
                 views.setTextViewText(R.id.widget_quran_subtitle, "Lanjut Baca")
             } else {
                 views.setTextViewText(R.id.widget_quran_text, "-")
-                views.setTextViewText(R.id.widget_quran_subtitle, "Belum ada riwayat")
+                views.setTextViewText(R.id.widget_quran_subtitle, streakMsg ?: "Belum ada riwayat")
             }
 
             if (hasPr) {
@@ -47,7 +49,7 @@ class KitaWidgetProvider : HomeWidgetProvider() {
                 views.setTextViewText(R.id.widget_pr_subtitle, "Count: ${prCount}x")
             } else {
                 views.setTextViewText(R.id.widget_pr_text, "-")
-                views.setTextViewText(R.id.widget_pr_subtitle, "Belum dikerjakan")
+                views.setTextViewText(R.id.widget_pr_subtitle, streakMsg ?: "Belum dikerjakan")
             }
 
             // Click handler for Qur'an area → opens app to last-read surah

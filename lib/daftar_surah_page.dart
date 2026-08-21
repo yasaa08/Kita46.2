@@ -309,8 +309,7 @@ class _DaftarSurahPageState extends State<DaftarSurahPage> {
                                 if (arabicName.isNotEmpty)
                                   Text(
                                     arabicName,
-                                    style: TextStyle(
-                                      fontFamily: 'LPMQ',
+                                    style: settings.getArabicStyle(
                                       fontSize: 20,
                                       color: sage.withOpacity(0.85),
                                     ),

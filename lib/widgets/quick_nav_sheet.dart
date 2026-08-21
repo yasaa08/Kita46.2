@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import '../app_settings.dart';
 
 class QuickNavSheet extends StatefulWidget {
   final List<QuickNavItem> items;
@@ -42,7 +43,7 @@ class _QuickNavSheetState extends State<QuickNavSheet>
   }
 
   void _toggle() {
-    HapticFeedback.lightImpact();
+    if (AppSettings().hapticEnabled) HapticFeedback.lightImpact();
     setState(() {
       _isExpanded = !_isExpanded;
       if (_isExpanded) {
@@ -176,7 +177,7 @@ class _QuickNavItemWidgetState extends State<_QuickNavItemWidget> {
       onTapDown: (_) => setState(() => _pressed = true),
       onTapUp: (_) {
         setState(() => _pressed = false);
-        HapticFeedback.lightImpact();
+        if (AppSettings().hapticEnabled) HapticFeedback.lightImpact();
         widget.item.onTap();
       },
       onTapCancel: () => setState(() => _pressed = false),

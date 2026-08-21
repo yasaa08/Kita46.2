@@ -141,7 +141,7 @@ class _KumpulanDoaPageState extends State<KumpulanDoaPage> {
                             style:
                                 TextStyle(color: textColor.withOpacity(0.4))))
                     : ListView.builder(
-                        padding: const EdgeInsets.fromLTRB(20, 8, 20, 120),
+                        padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
                         itemCount: _filteredDoa.length,
                         itemBuilder: (context, index) {
                           final item = _filteredDoa[index];

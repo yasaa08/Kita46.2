@@ -8,6 +8,8 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'app_settings.dart';
 import 'main.dart';
 import 'widget_service.dart';
+import 'widgets/quran_assistive_touch.dart';
+import 'streak_service.dart';
 
 String _cleanAyahText(String text) {
   int end = text.length;
@@ -120,9 +122,8 @@ class _DetailSurahPageState extends State<DetailSurahPage>
                     Text(
                       "سَجَدَ وَجْهِي لِلَّذِي خَلَقَهُ وَشَقَّ سَمْعَهُ وَبَصَرَهُ بِحَوْلِهِ وَقُوَّتِهِ",
                       textAlign: TextAlign.center,
-                      style: TextStyle(
+                      style: AppSettings().getArabicStyle(
                         fontSize: 24,
-                        fontFamily: 'LPMQ',
                         color: Colors.white,
                         height: 1.9,
                       ),
@@ -181,6 +182,7 @@ class _DetailSurahPageState extends State<DetailSurahPage>
   @override
   void initState() {
     super.initState();
+    AppSettings().addListener(_onSettingsChange);
     _floatingBarController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 500),
@@ -191,8 +193,13 @@ class _DetailSurahPageState extends State<DetailSurahPage>
     _scrollController.addListener(_onScroll);
   }
 
+  void _onSettingsChange() {
+    if (mounted) setState(() {});
+  }
+
   @override
   void dispose() {
+    AppSettings().removeListener(_onSettingsChange);
     _floatingBarController.dispose();
     _scrollController.removeListener(_onScroll);
     _scrollController.dispose();
@@ -210,6 +217,13 @@ class _DetailSurahPageState extends State<DetailSurahPage>
     } else if (delta < -8 && !_floatingBarVisible) {
       _floatingBarVisible = true;
       _floatingBarController.forward();
+    }
+
+    if (_scrollController.hasClients &&
+        _scrollController.position.maxScrollExtent > 0 &&
+        _scrollController.position.pixels >=
+            _scrollController.position.maxScrollExtent - 80) {
+      StreakService().recordActivity('quran');
     }
   }
 
@@ -265,6 +279,7 @@ class _DetailSurahPageState extends State<DetailSurahPage>
   }
 
   Future<bool> _saveLastRead(int ayahNumber) async {
+    StreakService().recordActivity('quran');
     final user = FirebaseAuth.instance.currentUser;
     if (user != null && !user.isAnonymous) {
       try {
@@ -321,6 +336,192 @@ class _DetailSurahPageState extends State<DetailSurahPage>
           );
         },
       ),
+    );
+  }
+
+  void _jumpToAyah(int targetAyah) {
+    if (_verses.isEmpty) return;
+    final clamped = targetAyah.clamp(1, _verses.length);
+    setState(() {
+      _selectedAyah = clamped;
+    });
+
+    if (_scrollController.hasClients) {
+      final maxScroll = _scrollController.position.maxScrollExtent;
+      final progress = (clamped - 1) / _verses.length;
+      final targetOffset = (progress * maxScroll).clamp(0.0, maxScroll);
+
+      _scrollController.animateTo(
+        targetOffset,
+        duration: const Duration(milliseconds: 600),
+        curve: Curves.easeInOutCubic,
+      );
+    }
+    showTopNotification(context, "${widget.surahName} Ayat $clamped");
+  }
+
+  void _showQuickDisplaySettings(BuildContext context) {
+    final settings = AppSettings();
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: bg,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
+      ),
+      builder: (ctx) {
+        return ListenableBuilder(
+          listenable: settings,
+          builder: (context, _) {
+            return SafeArea(
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Center(
+                      child: Container(
+                        width: 40,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: Colors.white24,
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: sageColor.withOpacity(0.15),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Icon(Icons.display_settings_rounded,
+                              color: sageColor, size: 20),
+                        ),
+                        const SizedBox(width: 12),
+                        const Text(
+                          "Pengaturan Tampilan Cepat",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Slider Ukuran Font
+                    Text(
+                        "Ukuran Font Arab: ${settings.arabicFontSize.toInt()}px",
+                        style: TextStyle(
+                            color: textColor.withOpacity(0.6), fontSize: 13)),
+                    Slider(
+                      value: settings.arabicFontSize,
+                      min: 20,
+                      max: 40,
+                      divisions: 4,
+                      activeColor: sageColor,
+                      inactiveColor: sageColor.withOpacity(0.2),
+                      onChanged: (val) async {
+                        if (settings.hapticEnabled) {
+                          HapticFeedback.selectionClick();
+                        }
+                        await settings.setArabicFontSize(val);
+                      },
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    // Pilihan Font Arab
+                    Text("Jenis Font Arab",
+                        style: TextStyle(
+                            color: textColor.withOpacity(0.6), fontSize: 13)),
+                    const SizedBox(height: 8),
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: AppSettings.arabicFontOptions.map((f) {
+                          final isSelected = settings.arabicFontFamily == f.key;
+                          return Padding(
+                            padding: const EdgeInsets.only(right: 8),
+                            child: ChoiceChip(
+                              label: Text(f.name),
+                              selected: isSelected,
+                              selectedColor: sageColor.withOpacity(0.25),
+                              backgroundColor: surface,
+                              labelStyle: TextStyle(
+                                color: isSelected ? sageColor : Colors.white70,
+                                fontWeight: isSelected
+                                    ? FontWeight.bold
+                                    : FontWeight.normal,
+                                fontSize: 12,
+                              ),
+                              side: BorderSide(
+                                color: isSelected
+                                    ? sageColor
+                                    : Colors.white.withOpacity(0.08),
+                              ),
+                              onSelected: (_) async {
+                                if (settings.hapticEnabled) {
+                                  HapticFeedback.selectionClick();
+                                }
+                                await settings.setArabicFontFamily(f.key);
+                              },
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // Switch Terjemahan
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: surface,
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Row(
+                            children: [
+                              Icon(Icons.translate_rounded,
+                                  color: Color(0xFFD2E0FB), size: 18),
+                              SizedBox(width: 10),
+                              Text(
+                                "Tampilkan Terjemahan",
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 13),
+                              ),
+                            ],
+                          ),
+                          Switch(
+                            value: settings.showTranslation,
+                            activeColor: sageColor,
+                            onChanged: (val) async {
+                              await settings.setShowTranslation(val);
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
     );
   }
 
@@ -405,8 +606,7 @@ class _DetailSurahPageState extends State<DetailSurahPage>
                         padding: const EdgeInsets.only(top: 8, bottom: 24),
                         child: Center(
                           child: Text("بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيم",
-                              style: TextStyle(
-                                  fontFamily: 'LPMQ',
+                              style: settings.getArabicStyle(
                                   fontSize: 26,
                                   color: sageColor,
                                   height: 2.0)),
@@ -508,9 +708,8 @@ class _DetailSurahPageState extends State<DetailSurahPage>
                                     Text(
                                       verse['arab']!,
                                       textAlign: TextAlign.right,
-                                      style: TextStyle(
+                                      style: settings.getArabicStyle(
                                           fontSize: arabFontSize,
-                                          fontFamily: 'LPMQ',
                                           color: textColor,
                                           height: 1.9),
                                     ),
@@ -614,6 +813,20 @@ class _DetailSurahPageState extends State<DetailSurahPage>
               ),
             ),
           ),
+
+          // ── Assistive Touch Floating Overlay ────────────────────────
+          if (!_isLoading)
+            QuranAssistiveTouch(
+              scrollController: _scrollController,
+              surahNumber: widget.surahNumber,
+              surahName: widget.surahName,
+              revelation: widget.revelation,
+              totalVerses: _verses.length,
+              allSurahList: _allSurah,
+              onJumpToAyah: _jumpToAyah,
+              onJumpToSurah: (surah) => _goToSurah(surah),
+              onOpenDisplaySettings: () => _showQuickDisplaySettings(context),
+            ),
         ],
       ),
     );

@@ -21,9 +21,12 @@ class _LoginPageState extends State<LoginPage> {
     try {
       if (AppSettings().hapticEnabled) HapticFeedback.mediumImpact();
 
-      // google_sign_in v7.x: gunakan instance singleton + initialize
-      // Tidak perlu serverClientId jika google-services.json sudah benar dan hanya butuh Firebase auth
-      await GoogleSignIn.instance.initialize();
+      // google_sign_in v7.x: Singleton + initialize with serverClientId
+      // serverClientId = Web client ID from google-services.json (client_type: 3)
+      await GoogleSignIn.instance.initialize(
+        serverClientId:
+            '343296288430-k8avc2kauot2ms4umf7vplqc5mf1j8sj.apps.googleusercontent.com',
+      );
 
       GoogleSignInAccount? googleUser;
 
@@ -31,6 +34,13 @@ class _LoginPageState extends State<LoginPage> {
         googleUser = await GoogleSignIn.instance.authenticate();
       } else {
         throw Exception('Platform tidak mendukung Google Sign-In');
+      }
+
+      // ignore: unnecessary_null_comparison
+      if (googleUser == null) {
+        // User membatalkan login
+        if (mounted) setState(() => _isLoadingGoogle = false);
+        return;
       }
 
       final GoogleSignInAuthentication googleAuth = googleUser.authentication;
@@ -55,10 +65,12 @@ class _LoginPageState extends State<LoginPage> {
         if (e.toString().contains('[16]')) {
           errMsg =
               "Error [16]: SHA-1 Debug Key belum ditambahkan di Firebase Console. Buka Terminal -> jalankan 'cd android && gradlew signingReport' lalu copy SHA-1 ke setelan Firebase.";
+        } else if (e.toString().contains('canceled') ||
+            e.toString().contains('cancelled')) {
+          errMsg = "Login dibatalkan";
         }
 
-        showTopNotification(context, errMsg,
-            bgColor: Colors.redAccent);
+        showTopNotification(context, errMsg, bgColor: Colors.redAccent);
       }
     } finally {
       if (mounted) setState(() => _isLoadingGoogle = false);

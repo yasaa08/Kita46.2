@@ -61,7 +61,7 @@ class _AsmaulHusnaPageState extends State<AsmaulHusnaPage> {
       body: _isLoading
           ? Center(child: CircularProgressIndicator(color: sageColor))
           : GridView.builder(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 120),
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
               // 3 kolom biar lebih kecil
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 3,
@@ -144,8 +144,7 @@ class _AsmaulHusnaCardState extends State<AsmaulHusnaCard> {
               const SizedBox(height: 32),
               Text(
                 widget.itemData['arabic'] ?? '',
-                style: TextStyle(
-                    fontFamily: 'LPMQ',
+                style: AppSettings().getArabicStyle(
                     fontSize: AppSettings().arabicFontSize.clamp(30.0, 60.0), // Ensure it's not too small or too big
                     color: sageColor,
                     height: 1.6),
@@ -220,8 +219,7 @@ class _AsmaulHusnaCardState extends State<AsmaulHusnaCard> {
                 textAlign: TextAlign.center,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontFamily: 'LPMQ',
+                style: AppSettings().getArabicStyle(
                   fontSize: 20,
                   color: sageColor,
                 ),

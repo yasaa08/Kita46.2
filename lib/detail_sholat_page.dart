@@ -133,8 +133,7 @@ class _DetailSholatPageState extends State<DetailSholatPage>
                   Text(
                     arabic,
                     textAlign: TextAlign.right,
-                    style: TextStyle(
-                        fontFamily: 'LPMQ',
+                    style: settings.getArabicStyle(
                         fontSize: settings.arabicFontSize + 4,
                         color: sageColor,
                         height: 1.9),

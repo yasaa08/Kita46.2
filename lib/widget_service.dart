@@ -39,6 +39,20 @@ class WidgetService {
     } catch (_) {}
   }
 
+  static Future<void> updateStreakData({
+    required int streakCount,
+    required String streakMessage,
+  }) async {
+    try {
+      await HomeWidget.saveWidgetData('widget_streak_count', streakCount.toString());
+      await HomeWidget.saveWidgetData('widget_streak_message', streakMessage);
+      await HomeWidget.updateWidget(
+        iOSName: _widgetName,
+        qualifiedAndroidName: 'com.example.kita_46_2.KitaWidgetProvider',
+      );
+    } catch (_) {}
+  }
+
   static String _todayStr() {
     final now = DateTime.now();
     return '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';

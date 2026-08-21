@@ -16,7 +16,7 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-  final user = FirebaseAuth.instance.currentUser;
+  User? get user => FirebaseAuth.instance.currentUser;
   final AppSettings _settings = AppSettings();
 
   final Color sageColor = const Color(0xFFB2C8BA);
@@ -112,7 +112,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 style: TextStyle(color: Colors.white38, fontSize: 12)),
             const SizedBox(height: 20),
             const Text(
-              "Kita 46.2 adalah platform all-in-one ibadah yang menggantikan buku fisik jadi digital — lebih praktis dan mudah diakses kapan saja.",
+              "Kita 46.2 adalah platform all-in-one ibadah yang menggantikan buku fisik jadi digital lebih praktis dan mudah diakses kapan saja.",
               textAlign: TextAlign.center,
               style:
                   TextStyle(color: Colors.white70, fontSize: 13, height: 1.5),
@@ -143,73 +143,307 @@ class _SettingsPageState extends State<SettingsPage> {
     }
   }
 
+  void _showFontSelectorModal(BuildContext context) {
+    final textColor = Colors.white;
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: bgColor,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      builder: (ctx) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Container(
+                    width: 38,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: Colors.white24,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: sageColor.withOpacity(0.15),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Icon(Icons.font_download_rounded,
+                            color: sageColor, size: 20),
+                      ),
+                      const SizedBox(width: 12),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Pilih Font Arab",
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: textColor,
+                            ),
+                          ),
+                          Text(
+                            "Berlaku untuk Al-Qur'an, Doa, & semua bacaan",
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: textColor.withOpacity(0.5),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Flexible(
+                  child: ListView.separated(
+                    shrinkWrap: true,
+                    itemCount: AppSettings.arabicFontOptions.length,
+                    separatorBuilder: (_, __) => const SizedBox(height: 8),
+                    itemBuilder: (context, index) {
+                      final option = AppSettings.arabicFontOptions[index];
+                      final isSelected =
+                          _settings.arabicFontFamily == option.key;
+
+                      return InkWell(
+                        onTap: () async {
+                          if (_settings.hapticEnabled) {
+                            HapticFeedback.selectionClick();
+                          }
+                          await _settings.setArabicFontFamily(option.key);
+                          if (ctx.mounted) Navigator.pop(ctx);
+                        },
+                        borderRadius: BorderRadius.circular(16),
+                        child: Container(
+                          padding: const EdgeInsets.all(14),
+                          decoration: BoxDecoration(
+                            color: isSelected
+                                ? sageColor.withOpacity(0.15)
+                                : surfaceColor,
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(
+                              color: isSelected
+                                  ? sageColor.withOpacity(0.6)
+                                  : Colors.white.withOpacity(0.06),
+                              width: isSelected ? 1.5 : 1,
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Text(
+                                          option.name,
+                                          style: TextStyle(
+                                            fontWeight: isSelected
+                                                ? FontWeight.bold
+                                                : FontWeight.w500,
+                                            color: isSelected
+                                                ? sageColor
+                                                : textColor,
+                                            fontSize: 14,
+                                          ),
+                                        ),
+                                        if (isSelected) ...[
+                                          const SizedBox(width: 8),
+                                          Icon(
+                                            Icons.check_circle_rounded,
+                                            size: 16,
+                                            color: sageColor,
+                                          ),
+                                        ],
+                                      ],
+                                    ),
+                                    const SizedBox(height: 3),
+                                    Text(
+                                      option.subtitle,
+                                      style: TextStyle(
+                                        color: textColor.withOpacity(0.4),
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Text(
+                                "بِسْمِ اللَّهِ",
+                                style: AppSettings.getStyleForFont(
+                                  option.key,
+                                  baseStyle: TextStyle(
+                                    fontSize: 18,
+                                    color: isSelected
+                                        ? sageColor
+                                        : textColor.withOpacity(0.85),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    const bg = Color(0xFF1A1C19);
-    const surface = Color(0xFF242822);
+    final bg = bgColor;
+    final surface = surfaceColor;
     const textColor = Colors.white;
 
     return Scaffold(
       backgroundColor: bg,
       appBar: AppBar(
-        title: Text("Pengaturan",
-            style: TextStyle(fontSize: 18, color: textColor)),
-        backgroundColor: Colors.transparent,
+        title: const Text("Pengaturan",
+            style: TextStyle(fontWeight: FontWeight.w500)),
+        backgroundColor: bg,
+        foregroundColor: textColor,
+        elevation: 0,
+        surfaceTintColor: Colors.transparent,
         centerTitle: true,
       ),
       body: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
         children: [
-          // ── Profil Akun ────────────────────────────────────────────
+          // ── Akun ───────────────────────────────────────────────────
           _sectionTitle("Akun", textColor),
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-                color: surface, borderRadius: BorderRadius.circular(24)),
-            child: Row(
-              children: [
-                CircleAvatar(
-                  radius: 28,
-                  backgroundColor: sageColor.withOpacity(0.2),
-                  backgroundImage: user?.photoURL != null
-                      ? NetworkImage(user!.photoURL!)
+          Builder(builder: (context) {
+            final currentUser = user;
+            final isGuest = currentUser == null || currentUser.isAnonymous;
+
+            return _buildCard(
+              surface: surface,
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(20),
+                  onTap: isGuest
+                      ? () {
+                          if (_settings.hapticEnabled) {
+                            HapticFeedback.lightImpact();
+                          }
+                          Navigator.push(
+                                  context, buildSlideRoute(const LoginPage()))
+                              .then((_) => setState(() {}));
+                        }
                       : null,
-                  child: user?.photoURL == null
-                      ? Icon(Icons.person, color: sageColor)
-                      : null,
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        user?.displayName ?? "Hamba Allah",
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                            color: textColor),
-                      ),
-                      Text(
-                        user?.isAnonymous == true
-                            ? "Mode Tamu"
-                            : (user?.email ?? "-"),
-                        style: TextStyle(
-                            color: textColor.withOpacity(0.4), fontSize: 12),
-                      ),
-                    ],
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 16),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 48,
+                          height: 48,
+                          decoration: BoxDecoration(
+                            color: sageColor.withOpacity(0.15),
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          child: !isGuest && currentUser.photoURL != null
+                              ? ClipRRect(
+                                  borderRadius: BorderRadius.circular(14),
+                                  child: Image.network(
+                                    currentUser.photoURL!,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (_, __, ___) => Icon(
+                                      Icons.person_rounded,
+                                      color: sageColor,
+                                      size: 24,
+                                    ),
+                                  ),
+                                )
+                              : Icon(
+                                  isGuest
+                                      ? Icons.account_circle_outlined
+                                      : Icons.person_rounded,
+                                  color: sageColor,
+                                  size: 24,
+                                ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                isGuest
+                                    ? "Hamba Allah"
+                                    : (currentUser.displayName ??
+                                        "Hamba Allah"),
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 15,
+                                    color: textColor),
+                              ),
+                              const SizedBox(height: 3),
+                              Text(
+                                isGuest ? "" : (currentUser.email ?? "-"),
+                                style: TextStyle(
+                                    color: textColor.withOpacity(0.4),
+                                    fontSize: 12),
+                              ),
+                            ],
+                          ),
+                        ),
+                        if (isGuest) ...[
+                          const SizedBox(width: 12),
+                          FilledButton.tonal(
+                            onPressed: () {
+                              if (_settings.hapticEnabled) {
+                                HapticFeedback.lightImpact();
+                              }
+                              Navigator.push(context,
+                                      buildSlideRoute(const LoginPage()))
+                                  .then((_) => setState(() {}));
+                            },
+                            style: FilledButton.styleFrom(
+                              backgroundColor: sageColor.withOpacity(0.18),
+                              foregroundColor: sageColor,
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 20, vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(14)),
+                            ),
+                            child: const Text(
+                              "Login",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 14),
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
                   ),
                 ),
-                if (user?.isAnonymous == true)
-                  TextButton(
-                    onPressed: () => Navigator.push(
-                        context, buildSlideRoute(const LoginPage())),
-                    child: Text("Login",
-                        style: TextStyle(color: sageColor, fontSize: 13)),
-                  ),
-              ],
-            ),
-          ).animate().fadeIn(duration: 350.ms),
+              ),
+            );
+          }).animate().fadeIn(duration: 350.ms),
 
           const SizedBox(height: 28),
 
@@ -234,7 +468,7 @@ class _SettingsPageState extends State<SettingsPage> {
                             color: sageColor.withOpacity(0.12),
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          child: Icon(Icons.text_fields_rounded,
+                          child: Icon(Icons.format_size_rounded,
                               color: sageColor, size: 20),
                         ),
                         const SizedBox(width: 14),
@@ -269,18 +503,73 @@ class _SettingsPageState extends State<SettingsPage> {
                           await _settings.setArabicFontSize(val);
                         },
                       ),
-                      // Preview
-                      Center(
-                        child: Text(
-                          "بِسْمِ اللَّهِ",
-                          style: TextStyle(
-                            fontFamily: 'LPMQ',
+                    ],
+                  ),
+                ),
+
+                _divider(textColor),
+
+                // Pilihan Jenis Font Arab
+                _buildTappableTile(
+                  icon: Icons.font_download_rounded,
+                  iconColor: const Color(0xFFCDE8E5),
+                  title: "Jenis Font Arab",
+                  subtitle: AppSettings.arabicFontOptions
+                      .firstWhere(
+                        (f) => f.key == _settings.arabicFontFamily,
+                        orElse: () => AppSettings.arabicFontOptions.first,
+                      )
+                      .name,
+                  textColor: textColor,
+                  onTap: () => _showFontSelectorModal(context),
+                ),
+
+                _divider(textColor),
+
+                // Preview Box
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 14),
+                    decoration: BoxDecoration(
+                      color: bgColor.withOpacity(0.6),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: sageColor.withOpacity(0.15),
+                      ),
+                    ),
+                    child: Column(
+                      children: [
+                        Text(
+                          "بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيم",
+                          textAlign: TextAlign.center,
+                          style: _settings.getArabicStyle(
                             fontSize: _settings.arabicFontSize,
                             color: sageColor,
+                            height: 1.6,
                           ),
                         ),
-                      ),
-                    ],
+                        const SizedBox(height: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: sageColor.withOpacity(0.12),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Text(
+                            "${_settings.arabicFontFamily} • ${_settings.arabicFontSize.toInt()}px",
+                            style: TextStyle(
+                              color: sageColor,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ],
@@ -289,18 +578,143 @@ class _SettingsPageState extends State<SettingsPage> {
 
           const SizedBox(height: 24),
 
-          // ── Bacaan ─────────────────────────────────────────────────
-          _sectionTitle("Bacaan", textColor),
+          // ── Terjemahan ─────────────────────────────────────────────────
+          _sectionTitle("Terjemahan", textColor),
           _buildCard(
             surface: surface,
-            child: _buildSwitchTile(
-              icon: Icons.translate_rounded,
-              iconColor: const Color(0xFFD2E0FB),
-              title: "Tampilkan Terjemahan",
-              subtitle: "Terjemahan ayat Al-Qur'an",
-              value: _settings.showTranslation,
-              textColor: textColor,
-              onChanged: (val) => _settings.setShowTranslation(val),
+            child: Column(
+              children: [
+                _buildSwitchTile(
+                  icon: Icons.translate_rounded,
+                  iconColor: const Color(0xFFD2E0FB),
+                  title: "Tampilkan Terjemahan",
+                  subtitle: "Terjemahan ayat Al-Qur'an",
+                  value: _settings.showTranslation,
+                  textColor: textColor,
+                  onChanged: (val) => _settings.setShowTranslation(val),
+                ),
+                _divider(textColor),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(Icons.verified_rounded,
+                              color: sageColor, size: 16),
+                          const SizedBox(width: 8),
+                          Text(
+                            "Sumber & Referensi Terjemahan",
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: textColor.withOpacity(0.9),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      // Item 1: Al-Qur'an
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 10),
+                        decoration: BoxDecoration(
+                          color: bgColor.withOpacity(0.5),
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 34,
+                              height: 34,
+                              decoration: BoxDecoration(
+                                color: sageColor.withOpacity(0.12),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Icon(Icons.menu_book_rounded,
+                                  color: sageColor, size: 17),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    "Al-Qur'an & Terjemahan",
+                                    style: TextStyle(
+                                      color: textColor,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    "Kementerian Agama RI (Kemenag RI)",
+                                    style: TextStyle(
+                                      color: textColor.withOpacity(0.45),
+                                      fontSize: 11,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      // Item 2: Doa, Sholat & PR 13
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 10),
+                        decoration: BoxDecoration(
+                          color: bgColor.withOpacity(0.5),
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 34,
+                              height: 34,
+                              decoration: BoxDecoration(
+                                color:
+                                    const Color(0xFFD2E0FB).withOpacity(0.12),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: const Icon(Icons.import_contacts_rounded,
+                                  color: Color(0xFFD2E0FB), size: 17),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    "Kumpulan Doa, Sholat & PR 13",
+                                    style: TextStyle(
+                                      color: textColor,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    "Buku himpunan doa fisik",
+                                    style: TextStyle(
+                                      color: textColor.withOpacity(0.45),
+                                      fontSize: 11,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ).animate().fadeIn(delay: 100.ms, duration: 350.ms),
 
@@ -368,8 +782,14 @@ class _SettingsPageState extends State<SettingsPage> {
                   title: "Beri Rating",
                   subtitle: "Bantu kami berkembang",
                   textColor: textColor,
-                  onTap: () =>
-                      showTopNotification(context, "Fitur segera hadir!"),
+                  onTap: () async {
+                    if (_settings.hapticEnabled) HapticFeedback.lightImpact();
+                    final url = Uri.parse(
+                        'https://apkpure.com/reviews/com.kita462.quran');
+                    if (!await launchUrl(url)) {
+                      debugPrint('Gagal membuka link rating');
+                    }
+                  },
                 ),
                 _divider(textColor),
                 _buildTappableTile(
@@ -378,8 +798,14 @@ class _SettingsPageState extends State<SettingsPage> {
                   title: "Bagikan Aplikasi",
                   subtitle: "Ajak temanmu",
                   textColor: textColor,
-                  onTap: () =>
-                      showTopNotification(context, "Membuka menu berbagi..."),
+                  onTap: () async {
+                    if (_settings.hapticEnabled) HapticFeedback.lightImpact();
+                    final url =
+                        Uri.parse('https://apkpure.com/p/com.kita462.quran');
+                    if (!await launchUrl(url)) {
+                      debugPrint('Gagal membuka link bagikan');
+                    }
+                  },
                 ),
               ],
             ),
